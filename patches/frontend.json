@@ -1,0 +1,537 @@
+{
+ "files": {
+  "assets/index-B8v13rah.js": {
+   "edits": [
+    {
+     "before": "y,j)=>(l(),v(\"div\",{key:",
+     "old": "",
+     "new": "`${Y.value}-${",
+     "after": "j,class:se([\"synthesis-i"
+    },
+    {
+     "before": ",j)=>(l(),v(\"div\",{key:j",
+     "old": "",
+     "new": "}`",
+     "after": ",class:se([\"synthesis-it"
+    },
+    {
+     "before": "}`);ho();const f=w(null)",
+     "old": "",
+     "new": ",dc=w(!1),sy=w(!1)",
+     "after": ";let S=-1,R=\"\";function "
+    },
+    {
+     "before": " f=w(null);let S=-1,R=\"\"",
+     "old": "",
+     "new": ",wwP=null,wwT=0,wwK=0,wwI=!1",
+     "after": ";function u(C){if(C.butt"
+    },
+    {
+     "before": "f=w(null);let S=-1,R=\"\";",
+     "old": "",
+     "new": "function ww(m){if(wwP){if(Date.now()-wwT>1500||m.activeTab===wwP)wwP=null;else return{...m,activeTab:wwP}}return m}function wwW(k){return new Promise(r=>{const ok=()=>innerWidth>=1096||k!==wwK;if(ok())return r();let t,h;const d=()=>{clearTimeout(t);removeEventListener(\"resize\",h);r()};h=()=>{ok()&&d()};t=setTimeout(d,600);addEventListener(\"resize\",h)})}",
+     "after": "function u(C){if(C.butto"
+    },
+    {
+     "before": "G})}async function J(C){",
+     "old": "",
+     "new": "if(C!==\"toggle\"&&f.value&&f.value.activeTab!==C){wwP=C;wwT=Date.now();f.value={...f.value,activeTab:C}}",
+     "after": "await de({type:\"tab-clic"
+    },
+    {
+     "before": "rn}S=m.revision,f.value=",
+     "old": "",
+     "new": "ww(",
+     "after": "m,Kn(m.assetsCdnHost,{tr"
+    },
+    {
+     "before": "n}S=m.revision,f.value=m",
+     "old": "",
+     "new": ")",
+     "after": ",Kn(m.assetsCdnHost,{tri"
+    },
+    {
+     "before": "(()=>f.value?.collapsed,",
+     "old": "",
+     "new": "async ",
+     "after": "C=>{typeof C==\"boolean\"&"
+    },
+    {
+     "before": ">f.value?.collapsed,C=>{",
+     "old": "",
+     "new": "if(",
+     "after": "typeof C==\"boolean\"&&co("
+    },
+    {
+     "before": "?.collapsed,C=>{typeof C",
+     "old": "=",
+     "new": "!",
+     "after": "=\"boolean\"&&co(C).catch("
+    },
+    {
+     "before": ",C=>{typeof C==\"boolean\"",
+     "old": "&&",
+     "new": ")return;",
+     "after": "co(C).catch(m=>{console."
+    },
+    {
+     "before": "{typeof C==\"boolean\"&&co",
+     "old": "(C).c",
+     "new": "nst k=++wwK,b",
+     "after": "atch(m=>{console.warn(\"["
+    },
+    {
+     "before": "f C==\"boolean\"&&co(C).ca",
+     "old": "tch(",
+     "new": "d=",
+     "after": "m=>{console.warn(\"[panel"
+    },
+    {
+     "before": "oolean\"&&co(C).catch(m=>",
+     "old": "{",
+     "new": "",
+     "after": "console.warn(\"[panel] sy"
+    },
+    {
+     "before": "d window size failed\",m)",
+     "old": "",
+     "new": ";if(!wwI){wwI=!0;dc.value=C;co(C).catch(bad);return",
+     "after": "})}),ae(()=>f.value?.act"
+    },
+    {
+     "before": " window size failed\",m)}",
+     "old": "",
+     "new": "sy.value=!0;try{if(C){dc.value=!0;await new Promise(r=>setTimeout(r,30));await co(!0",
+     "after": ")}),ae(()=>f.value?.acti"
+    },
+    {
+     "before": "indow size failed\",m)})}",
+     "old": "",
+     "new": "else{await co(!1);await wwW(k);if(k!==wwK)return;dc.value=!1}await new Promise(r=>setTimeout(r,320))}catch(m){bad(m)}finally{k===wwK&&(sy.value=!1)}}",
+     "after": "),ae(()=>f.value?.active"
+    },
+    {
+     "before": "nel-window-root\",T.value",
+     "old": "",
+     "new": ",{\"panel-window-root--sync\":sy.value}",
+     "after": "]),onContextmenu:m[14]||"
+    },
+    {
+     "before": "G),visible:!0,collapsed:",
+     "old": "f",
+     "new": "dc",
+     "after": ".value.collapsed,draggin"
+    },
+    {
+     "before": "ble:!0,collapsed:f.value",
+     "old": ".collapsed",
+     "new": "",
+     "after": ",dragging:!1,\"panel-drag"
+    }
+   ],
+   "sha256_before": "f7e8ea84e08b3268639ff62eb09a02001a2e13a191862e7956cb1b2e6a44cf8b",
+   "sha256_after": "e39eb29d69a26d658b43d801acc247a35d73128d0af3d891d42e5e11b2c3b2d2"
+  },
+  "assets/index-BjTCKBy6.css": {
+   "edits": [
+    {
+     "before": "display:swap}@font-face{",
+     "old": "font-family:GenSenRounded-M;src:url(./GenSenRounded-M-IdyG9UEk.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:swap;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%}@font-face{font-family:GenSenRounded-B;src:url(./GenSenRounded-B-BZwrY0nR.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:swap;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%}@font-face{",
+     "new": "",
+     "after": "font-family:GenSenRounde"
+    },
+    {
+     "before": "ormal;font-display:swap}",
+     "old": "",
+     "new": "@font-face{font-family:GenSenRounded-M;src:url(./WuwaTappoLatin-Medium.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:block;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%;unicode-range:U+0000-024F,U+0300-052F,U+1E00-1EFF,U+2000-27FF,U+3000-303F,U+30FB,U+FF00-FF65,U+FFE0-FFEE}@font-face{font-family:GenSenRounded-M;src:url(./GenSenRounded-M-IdyG9UEk.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:swap;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%;unicode-range:U+0250-02FF,U+0530-1DFF,U+1F00-1FFF,U+2800-2FFF,U+3040-30FA,U+30FC-FEFF,U+FF66-FFDF,U+FFEF-10FFFF}@font-face{font-family:GenSenRounded-B;src:url(./WuwaTappoLatin-Bold.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:block;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%;unicode-range:U+0000-024F,U+0300-052F,U+1E00-1EFF,U+2000-27FF,U+3000-303F,U+30FB,U+FF00-FF65,U+FFE0-FFEE}@font-face{font-family:GenSenRounded-B;src:url(./GenSenRounded-B-BZwrY0nR.woff2) format(\"woff2\");font-weight:500;font-style:normal;font-display:swap;ascent-override:98.8%;descent-override:19.6%;line-gap-override:0%;unicode-range:U+0250-02FF,U+0530-1DFF,U+1F00-1FFF,U+2800-2FFF,U+3040-30FA,U+30FC-FEFF,U+FF66-FFDF,U+FFEF-10FFFF}",
+     "after": ".locale-zh{--font-main: "
+    },
+    {
+     "before": "ew-type{text-indent:1em}",
+     "old": "",
+     "new": "\n\n/* native window resize in flight (collapse/expand): keep the content card at its design width, never stretch or clip it */\n.panel-window-root--sync .module-content{flex:0 0 849px}",
+     "after": "\n"
+    }
+   ],
+   "sha256_before": "ab9ef4a81b17a658da1583891a4495cd02487918b2d303181f705c52636d7d95",
+   "sha256_after": "3757d9610aa59746ba540fd3555c425001da24ba1be02774cdf94847187c7267"
+  },
+  "assets/index-CHhF-M4P.js": {
+   "edits": [
+    {
+     "before": "value=!1,await Oe(),h(),",
+     "old": "",
+     "new": "wakeSpringFrame(),",
+     "after": "requestAnimationFrame(()"
+    },
+    {
+     "before": "O.targetR=-.025,O.vy-=.8",
+     "old": "",
+     "new": ",wakeSpringFrame()",
+     "after": "}function V(X){const O=S"
+    },
+    {
+     "before": "argetR=0,O.returnTimer=0",
+     "old": "",
+     "new": ",wakeSpringFrame()",
+     "after": "},115),O.releaseTimer=0}"
+    },
+    {
+     "before": "0},115),O.releaseTimer=0",
+     "old": "",
+     "new": ",wakeSpringFrame()",
+     "after": "},Y)}function G(X,O){O.c"
+    },
+    {
+     "before": "t\",{id:O.id,src:O.src})}",
+     "old": "",
+     "new": "function springAtRest(O){return O.x===O.targetX&&O.y===O.targetY&&O.r===O.targetR&&O.vx===0&&O.vy===0&&O.vr===0}\nfunction wakeSpringFrame(){if(L||!f.value||D)return;for(const O of S.values())if(!springAtRest(O)){C=performance.now(),L=requestAnimationFrame(De);break}}\n",
+     "after": "function De(X){const O=M"
+    },
+    {
+     "before": ":O.src})}function De(X){",
+     "old": "",
+     "new": "L=0;if(!f.value||D)return;",
+     "after": "const O=Math.min((X-C)/1"
+    },
+    {
+     "before": "min((X-C)/1e3,.028);C=X;",
+     "old": "",
+     "new": "let K=!1;",
+     "after": "for(const[K,Y]of S)[Y.x,"
+    },
+    {
+     "before": "1e3,.028);C=X;for(const[",
+     "old": "K",
+     "new": "Y",
+     "after": ",Y]of S)[Y.x,Y.vx]=E(Y.x"
+    },
+    {
+     "before": "3,.028);C=X;for(const[K,",
+     "old": "Y",
+     "new": "Q",
+     "after": "]of S)[Y.x,Y.vx]=E(Y.x,Y"
+    },
+    {
+     "before": ";C=X;for(const[K,Y]of S)",
+     "old": "",
+     "new": "{if(springAtRest(Q))continue;",
+     "after": "[Y.x,Y.vx]=E(Y.x,Y.vx,Y."
+    },
+    {
+     "before": "C=X;for(const[K,Y]of S)[",
+     "old": "Y",
+     "new": "Q",
+     "after": ".x,Y.vx]=E(Y.x,Y.vx,Y.ta"
+    },
+    {
+     "before": "for(const[K,Y]of S)[Y.x,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vx]=E(Y.x,Y.vx,Y.target"
+    },
+    {
+     "before": "t[K,Y]of S)[Y.x,Y.vx]=E(",
+     "old": "Y",
+     "new": "Q",
+     "after": ".x,Y.vx,Y.targetX,245,13"
+    },
+    {
+     "before": "Y]of S)[Y.x,Y.vx]=E(Y.x,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vx,Y.targetX,245,13.2,O"
+    },
+    {
+     "before": "S)[Y.x,Y.vx]=E(Y.x,Y.vx,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".targetX,245,13.2,O),[Y."
+    },
+    {
+     "before": ",Y.targetX,245,13.2,O),[",
+     "old": "Y",
+     "new": "Q",
+     "after": ".y,Y.vy]=E(Y.y,Y.vy,Y.ta"
+    },
+    {
+     "before": "argetX,245,13.2,O),[Y.y,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vy]=E(Y.y,Y.vy,Y.target"
+    },
+    {
+     "before": "45,13.2,O),[Y.y,Y.vy]=E(",
+     "old": "Y",
+     "new": "Q",
+     "after": ".y,Y.vy,Y.targetY,285,14"
+    },
+    {
+     "before": "3.2,O),[Y.y,Y.vy]=E(Y.y,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vy,Y.targetY,285,14,O),"
+    },
+    {
+     "before": "),[Y.y,Y.vy]=E(Y.y,Y.vy,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".targetY,285,14,O),[Y.r,"
+    },
+    {
+     "before": "vy,Y.targetY,285,14,O),[",
+     "old": "Y",
+     "new": "Q",
+     "after": ".r,Y.vr]=E(Y.r,Y.vr,Y.ta"
+    },
+    {
+     "before": ".targetY,285,14,O),[Y.r,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vr]=E(Y.r,Y.vr,Y.target"
+    },
+    {
+     "before": ",285,14,O),[Y.r,Y.vr]=E(",
+     "old": "Y",
+     "new": "Q",
+     "after": ".r,Y.vr,Y.targetR,205,12"
+    },
+    {
+     "before": ",14,O),[Y.r,Y.vr]=E(Y.r,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".vr,Y.targetR,205,12.5,O"
+    },
+    {
+     "before": "),[Y.r,Y.vr]=E(Y.r,Y.vr,",
+     "old": "Y",
+     "new": "Q",
+     "after": ".targetR,205,12.5,O),H(K"
+    },
+    {
+     "before": "vr,Y.targetR,205,12.5,O)",
+     "old": "",
+     "new": ";if(Math.abs(Q.x-Q.targetX)<1e-4&&Math.abs(Q.y-Q.targetY)<1e-4&&Math.abs(Q.r-Q.targetR)<1e-4&&Math.abs(Q.vx)<1e-3&&Math.abs(Q.vy)<1e-3&&Math.abs(Q.vr)<1e-3)Q.x=Q.targetX",
+     "after": ",H(K,Y);L=requestAnimati"
+    },
+    {
+     "before": "r,Y.targetR,205,12.5,O),",
+     "old": "",
+     "new": "Q.y=Q.targetY,Q.r=Q.targetR,Q.vx=Q.vy=Q.vr=0;else K=!0;",
+     "after": "H(K,Y);L=requestAnimatio"
+    },
+    {
+     "before": "Y.targetR,205,12.5,O),H(",
+     "old": "",
+     "new": "Y,Q)}",
+     "after": "K,Y);L=requestAnimationF"
+    },
+    {
+     "before": ".targetR,205,12.5,O),H(K",
+     "old": ",Y);",
+     "new": "&&(",
+     "after": "L=requestAnimationFrame("
+    },
+    {
+     "before": "equestAnimationFrame(De)",
+     "old": "",
+     "new": ")",
+     "after": "}return Ds(()=>{C=perfor"
+    },
+    {
+     "before": ")=>{C=performance.now(),",
+     "old": "L=",
+     "new": "wakeSp",
+     "after": "requestAnimationFrame(De"
+    },
+    {
+     "before": "{C=performance.now(),L=r",
+     "old": "equestA",
+     "new": "i",
+     "after": "nimationFrame(De),window"
+    },
+    {
+     "before": "rmance.now(),L=requestAn",
+     "old": "imation",
+     "new": "g",
+     "after": "Frame(De),window.addEven"
+    },
+    {
+     "before": "L=requestAnimationFrame(",
+     "old": "De",
+     "new": "",
+     "after": "),window.addEventListene"
+    }
+   ],
+   "sha256_before": "910d1a38d5b745fc3e4092032d43adfdffb216b42829c87bdb73df65252b7a9f",
+   "sha256_after": "73aca8326ab9d939bbbfd42a95988f273c58278a936ae3c45da0b8430c79ae2f"
+  },
+  "assets/index-ULLd3gpz.js": {
+   "edits": [
+    {
+     "before": "voke$1(e,t={},n){return ",
+     "old": "",
+     "new": "(window.__wwInvoke||",
+     "after": "window.__TAURI_INTERNALS"
+    },
+    {
+     "before": "TAURI_INTERNALS__.invoke",
+     "old": "",
+     "new": ")",
+     "after": "(e,t,n)}function convert"
+    },
+    {
+     "before": "TauriRuntime())return!1;",
+     "old": "const e=\"true\".toLowerCase();",
+     "new": "",
+     "after": "return e!==\"false\"&&e!=="
+    },
+    {
+     "before": "ue\".toLowerCase();return",
+     "old": " e",
+     "new": "",
+     "after": "!==\"false\"&&e!==\"0\"}asyn"
+    },
+    {
+     "before": ".toLowerCase();return e!",
+     "old": "==\"false\"&&e!==\"0\"",
+     "new": "1",
+     "after": "}async function getAppVe"
+    }
+   ],
+   "sha256_before": "405831b6ec1b4e8d8bad7d905b1b448133313aafeef8222c9d3ab3fde159a9bb",
+   "sha256_after": "1bfbf31a12f22768bb7efac06281d7135a5b91f06bd6ff9d12567117d7ff188a"
+  },
+  "assets/switchDisplayMonitor-2jwec8t8.js": {
+   "edits": [
+    {
+     "before": "tion Ht(){if(y)return y;",
+     "old": "",
+     "new": "const t=await f(\"begin_main_monitor_switch\");if(t===null)return!1;",
+     "after": "y=Nt();try{return await "
+    },
+    {
+     "before": "n await y}finally{y=null",
+     "old": "",
+     "new": ";await f(\"end_main_monitor_switch\",{token:t",
+     "after": "}}async function Yt(){co"
+    },
+    {
+     "before": " await y}finally{y=null}",
+     "old": "",
+     "new": ").catch(e=>console.warn(\"[switch-display] release native gate failed\",e))}",
+     "after": "}async function Yt(){con"
+    }
+   ],
+   "sha256_before": "91ef9cf53ccaf7f3c6554c29059b7fafb0694af6adcfd8c65175fa4ee6d079f5",
+   "sha256_after": "20af4a7c9dbbc12eddb62eb3b74c97b7bfef157d111e6b35d44b8e43672415b9"
+  },
+  "index.html": {
+   "edits": [
+    {
+     "before": "<!doctype html>",
+     "old": "\r",
+     "new": "",
+     "after": "\n<html lang=\"en\">\r\n  <he"
+    },
+    {
+     "before": " html>\r\n<html lang=\"en\">",
+     "old": "\r",
+     "new": "",
+     "after": "\n  <head>\r\n    <meta cha"
+    },
+    {
+     "before": "tml lang=\"en\">\r\n  <head>",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <meta charset=\"UTF-"
+    },
+    {
+     "before": "<meta charset=\"UTF-8\" />",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <link rel=\"icon\" ty"
+    },
+    {
+     "before": " href=\"./favicon.png\" />",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <meta name=\"viewpor"
+    },
+    {
+     "before": "h, initial-scale=1.0\" />",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <title>Wuwa Tappo</"
+    },
+    {
+     "before": "title>Wuwa Tappo</title>",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <style>\n      html,"
+    },
+    {
+     "before": "rent !important;\n      }",
+     "old": "",
+     "new": "\n      /* First-paint gate (see the script below and docs/ui-flash-and-fonts.md). Not opacity:0: WebKit skips\n         painting fully transparent layers, which would make the reveal itself render a blank first frame. */\n      html[data-ww-gate] {\n        opacity: 0.004;\n        pointer-events: none;\n      }",
+     "after": "\n    </style>\r\n    <scri"
+    },
+    {
+     "before": "nt;\n      }\n    </style>",
+     "old": "\r",
+     "new": "\n    <!-- The two Latin faces serve every English/Western UI string; warm them before CSS is even parsed. -->\n    <link rel=\"preload\" as=\"font\" type=\"font/woff2\" crossorigin href=\"./assets/WuwaTappoLatin-Medium.woff2\" />\n    <link rel=\"preload\" as=\"font\" type=\"font/woff2\" crossorigin href=\"./assets/WuwaTappoLatin-Bold.woff2\" />",
+     "after": "\n    <script type=\"modul"
+    },
+    {
+     "before": "/index-BjTCKBy6.css\">\n  ",
+     "old": "",
+     "new": "  <script>\n      // Reveal gate: the window may be mapped before the page has finished loading, so keep the document\n      // (practically) invisible until the route component is mounted, its first state has arrived, the fonts\n      // and CSS images that the first frame uses are loaded, and one frame has been laid out. Everything here\n      // is timer/promise driven: requestAnimationFrame does not run while a window is unmapped.\n      // Contract: no Rust cooperation needed; a hard timeout always reveals. Toast is an overlay and is exempt.\n      (function () {\n        var de = document.documentElement;\n        if (location.hash.indexOf('#/toast') === 0) return;\n        de.setAttribute('data-ww-gate', '');\n        // Keep the native window hidden until this gate finishes, including slow locale fonts.\n        try { var I = window.__TAURI_INTERNALS__; if (I) I.invoke('window_gate').catch(function () {}); } catch (e) {}\n        var t0 = performance.now(), MAX = 4000, done = false;\n        function reveal(why) {\n          if (done) return;\n          done = true;\n          de.removeAttribute('data-ww-gate');\n          de.setAttribute('data-ww-ready', why + '@' + Math.round(performance.now() - t0));\n          window.__wwReady = why;\n          // Optional hook for a future Rust \"show after ready\" (docs/ui-flash-and-fonts.md); rejects harmlessly today.\n          try { var I = window.__TAURI_INTERNALS__; if (I) I.invoke('window_ready', { reason: why }).catch(function () {}); } catch (e) {}\n        }\n        setTimeout(function () { reveal('timeout'); }, MAX);\n\n        // Same locale -> font mapping as the app's .locale-* classes (index CSS).\n        var FAMS = { jp: ['GenSenRoundedJP-M', 'GenSenRoundedJP-B'], zh: ['975MaruSC', '975MaruSC-Bold'],\n          tw: ['SourceHanSansCN-Medium', 'SourceHanSansCN-Bold'], kr: ['NanumGothic-Bold', 'NanumGothic-ExtraBold'],\n          th: ['Prompt-Medium', 'Prompt-Bold'] };\n        var loc = 'en';\n        try {\n          loc = localStorage.getItem('wuwatappo-locale') || '';\n          if (!loc) {\n            var tags = (navigator.languages || [navigator.language]).map(function (x) { return String(x).toLowerCase(); });\n            for (var i = 0; i < tags.length && !loc; i++) {\n              var g = tags[i];\n              loc = /^zh-(tw|hk|hant)/.test(g) ? 'tw' : g.indexOf('ja') === 0 ? 'jp' : g.indexOf('ko') === 0 ? 'kr'\n                : /^(fr|de|es|pt|th)/.test(g) ? g.slice(0, 2) : '';\n            }\n          }\n        } catch (e) {}\n        var fams = FAMS[loc] || ['GenSenRounded-M', 'GenSenRounded-B'];\n        // Start the locale's faces now (parallel with the JS chunks). Latin glyph probe only loads the small face.\n        function warm() {\n          fams.forEach(function (f) {\n            try { document.fonts.load('500 16px \"' + f + '\"', 'Aa' + (FAMS[loc] ? '中あ한ก' : '')).catch(function () {}); } catch (e) {}\n          });\n        }\n        warm();\n\n        function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }\n        function contentReady() {\n          var c = document.getElementById('app') && document.getElementById('app').firstElementChild;\n          if (!c) return false;\n          if (c.classList.contains('panel-window-loading')) return false;\n          if (c.classList.contains('panel-window-root')) return !!c.querySelector('.module-panel');\n          return true;\n        }\n        // Forcing layout makes WebKit request every face the current text needs; status stays \"loading\" until\n        // they are all in (CSS Font Loading: document.fonts.status / ready).\n        function fontsSettled() { void document.body.offsetHeight; return document.fonts.status === 'loaded'; }\n        // Local CSS background/mask images of what is actually laid out (not <img>: those are remote CDN\n        // item icons that stream in by design and must never hold the window back).\n        function cssImages() {\n          var urls = {}, nodes = document.querySelectorAll('#app *'), n = Math.min(nodes.length, 1500);\n          for (var i = 0; i < n; i++) {\n            if (!nodes[i].getClientRects().length) continue;\n            var cs = getComputedStyle(nodes[i]);\n            [cs.backgroundImage, cs.webkitMaskImage].forEach(function (v) {\n              if (!v || v === 'none') return;\n              v.replace(/url\\([\"']?([^\"')]+)[\"']?\\)/g, function (_, u) { if (u.indexOf(location.protocol + '//' + location.host) === 0) urls[u] = 1; return _; });\n            });\n          }\n          return Object.keys(urls).map(function (u) {\n            var im = new Image();\n            im.src = u;\n            return im.decode ? im.decode().catch(function () {}) : Promise.resolve();\n          });\n        }\n        (async function () {\n          try {\n            while (!done && !contentReady()) await sleep(16);\n            if (done) return;\n            var stable = 0;\n            while (!done && stable < 2) { // two consecutive quiet checks: late text may request more faces\n              await sleep(16);\n              stable = fontsSettled() ? stable + 1 : 0;\n            }\n            if (done) return;\n            await Promise.race([Promise.all(cssImages()), sleep(800)]);\n            if (!fontsSettled()) { await Promise.race([document.fonts.ready, sleep(1500)]); }\n            // One frame of layout with the final fonts; rAF may not run while unmapped, so bound it.\n            await Promise.race([new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }), sleep(100)]);\n            reveal('ready');\n          } catch (e) { reveal('error'); }\n        })();\n      })();\n    </script>\n  ",
+     "after": "</head>\r\n\r\n  <body>\r\n   "
+    },
+    {
+     "before": "BjTCKBy6.css\">\n  </head>",
+     "old": "\r",
+     "new": "",
+     "after": "\n\r\n  <body>\r\n    <div id"
+    },
+    {
+     "before": "TCKBy6.css\">\n  </head>\r\n",
+     "old": "\r",
+     "new": "",
+     "after": "\n  <body>\r\n    <div id=\""
+    },
+    {
+     "before": "\">\n  </head>\r\n\r\n  <body>",
+     "old": "\r",
+     "new": "",
+     "after": "\n    <div id=\"app\"></div"
+    },
+    {
+     "before": "    <div id=\"app\"></div>",
+     "old": "\r\r",
+     "new": "",
+     "after": "\n  </body>\r\n</html>\r\n"
+    },
+    {
+     "before": "\"app\"></div>\r\r\n  </body>",
+     "old": "\r",
+     "new": "",
+     "after": "\n</html>\r\n"
+    },
+    {
+     "before": "iv>\r\r\n  </body>\r\n</html>",
+     "old": "\r",
+     "new": "",
+     "after": "\n"
+    }
+   ],
+   "sha256_before": "40327142b275ec633fe05d1f7a8afa264d4384c9bbdc89227dae374154537119",
+   "sha256_after": "572bd425c8b9d41a030058088fedbfcefa4df6aba99fc89ec00094b7ae05103f"
+  }
+ },
+ "generated": {
+  "assets/WuwaTappoLatin-Bold.woff2": "ce102305afb7211e9794b9e89c5795a847ad035882b55f5b438e29f6a449d154",
+  "assets/WuwaTappoLatin-Medium.woff2": "aa7a18145c6fc0327062e26cc0704cb7108bb23fff81ba692f72c837dd448bd8",
+  "assets/WuwaTappoLatin-OFL.txt": "d84b652ca46586043946969a33c1dbf5a43028440825ae744a325965bec4c8fb"
+ }
+}

@@ -1,0 +1,37 @@
+name: Bug report or test result
+description: Something does not work, or you tested it on a new system
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! **Never paste tokens, cookies, `store.json`, full logs or `wuwa-buddy://` links.** Redact them first.
+        This project is experimental and unofficial. Using it with a real account may violate Kuro's terms.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: Your system
+      description: Distribution and version, CPU architecture, desktop and compositor (for example KDE Plasma 6 Wayland), `webkit2gtk4.1` version.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: clicks
+    attributes:
+      label: If clicks do not reach other apps
+      description: Output of `tools/trace_input_regions.py` (see docs/development.md). Optional otherwise.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines (redacted)
+      render: text

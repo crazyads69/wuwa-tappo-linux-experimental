@@ -1,0 +1,14 @@
+name: Idea or improvement
+description: Suggest something (bug reports and test results are more valuable right now)
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: Does it depend on a specific desktop or compositor?

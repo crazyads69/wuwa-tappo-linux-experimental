@@ -1,0 +1,29 @@
+# Never commit anything that comes from the official app or installer.
+# scripts/setup.sh recreates dist/ and the icon locally from an installer you already own.
+*.exe
+*.msi
+*.nsis
+/dist/
+/src-tauri/icons/
+*.woff
+*.woff2
+*.ttf
+*.otf
+*.asar
+
+# Build output and tooling
+/src-tauri/target/
+/src-tauri/gen/
+/.setup-venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# Logs, captures and anything that may contain tokens or personal data
+*.log
+*.dat
+store.json
+/screenshots/
+/shots/
+.env
+*.token
