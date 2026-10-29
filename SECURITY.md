@@ -34,3 +34,10 @@ Out of scope: Kuro's frontend code, servers and accounts. Report problems with t
 ## Supported versions
 
 Only the latest commit on `main`.
+
+## Known dependency advisories
+
+- **glib 0.18.5, `VariantStrIter` unsoundness** (GitHub Dependabot alert, moderate; fixed in glib 0.20). glib comes
+  in through the GTK 3 Rust bindings (`gtk` 0.18, `webkit2gtk`) that Tauri 2 and its window library use on Linux, so
+  it cannot be upgraded here without a change in Tauri itself. This project's own code does not use `glib::Variant`
+  (checked with a search of `src-tauri/src`). The alert stays open until the upstream stack moves on.
