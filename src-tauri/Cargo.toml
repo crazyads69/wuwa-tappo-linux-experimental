@@ -26,3 +26,10 @@ zbus = "5"
 gtk-layer-shell = { version = "0.8", features = ["v0_6"] }
 tauri-plugin-deep-link = "2.6"
 tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
+tokio-tungstenite = { version = "0.30.0", default-features = false, features = ["connect", "native-tls"] }
+futures-util = { version = "0.3.34", default-features = false, features = ["std", "sink"] }
+tokio = { version = "1.54.1", features = ["sync", "time", "macros"] }
+base64 = "0.23.1"
+
+[dev-dependencies]
+tokio = { version = "1.54.1", features = ["net", "rt", "macros"] }

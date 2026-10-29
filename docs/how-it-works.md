@@ -54,6 +54,7 @@ window, and force a redraw of the Synthesis slots (a WebKitGTK painting bug left
 | `monitors.rs`, `platform.js` | Chooses the output for the pet, handles F8 (switch monitor) and the coordinate maths for mixed scaling. |
 | `desktop_integration.rs` | Reads Plasma's panel and fullscreen state, and keeps the overlay layer correct. |
 | `service_status.rs` | The maintenance-notice handshake the frontend expects. |
+| `native_ws.rs`, `ws.js` | The multiplayer socket. Kuro's socket server answers a WebSocket handshake with HTTP 403 unless the `Origin` header is missing or exactly `http(s)://tauri.localhost`; WebKitGTK sends `tauri://localhost`. `ws.js` redirects that one `wss://` URL to a native client that sends no `Origin`. The client only connects to the one allowed host and path, limits message size and the number of sockets, and closes a window's sockets when it closes. |
 | `cookies.js` | The frontend keeps its session in `document.cookie`, which WebKitGTK does not persist for the `tauri://` scheme; this stores it in `localStorage` instead. |
 
 ### The overlay trick

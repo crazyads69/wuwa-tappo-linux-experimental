@@ -40,6 +40,7 @@ distributions and hardware are unknown territory. The full table, with how each 
 | Counting clicks and key presses anywhere on screen | Works on the author's machine (needs read access to `/dev/input`). Touchpad tap-to-click detection exists but is only unit-tested, not confirmed on hardware. |
 | Panel (Backpack, Gallery, Synthesis, Multiplayer, Settings) | Opens and renders. Chest, redeem-code, exchange and multiplayer actions that change server data were **not** exercised. |
 | Login through the browser (`wuwa-buddy://` callback) | Worked once for the author on 2026-10-28. Not re-verified since. |
+| Multiplayer connection | The socket now connects (`[SOCKET] connected` in the log; it used to fail with HTTP 403 because of the browser origin). Creating or joining rooms and chatting with other players were **not** tested. |
 | Switching the pet between monitors with F8 | Tested only in a virtual two-monitor KDE session, never on real external monitors. |
 | F7/F8/F9 hotkeys | Implemented through KDE's shortcut system, tested in an isolated session. **While the app runs, other apps no longer receive these three keys.** |
 | Automatic updates | Not supported, on purpose. The app never downloads or runs a Windows installer. |
@@ -90,6 +91,10 @@ counters in `store.json`, a log in `logs/`).
   third-party programs" and let Kuro suspend or terminate accounts "without notice". Whether a Linux shell for this
   companion app counts, and whether Kuro can even tell, is unknown. I found no reports of bans for tools like this,
   and I cannot promise there will be none. The app identifies itself to Kuro's servers as running on Linux.
+- **Multiplayer connection.** Kuro's socket server refuses browser connections from this app's origin, so the app
+  opens that one connection natively: it connects only to Kuro's own socket host, sends no `Origin` header and no
+  cookie, and identifies itself as `wuwatappo-linux/<version> (unofficial)`. The same session token the official
+  app would send is used. See [docs/how-it-works.md](docs/how-it-works.md).
 - **Your keystrokes.** To count global key presses and clicks like the Windows app does, the app reads your input
   devices through `/dev/input` (read-only, it never grabs or changes them). It forwards only key names to the
   frontend and stores only counters, never typed text. You can switch this off with `WUWA_NO_GLOBAL_INPUT=1`, and

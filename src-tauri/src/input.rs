@@ -153,6 +153,9 @@ const ABS_MT_POSITION_X: usize = 0x35;
 const DOM_WAIT: Duration = Duration::from_millis(50);
 // libinput releases a tapped button ~180 ms after the lift, so the compositor's DOM release lags our tap.
 const TAP_WAIT: Duration = Duration::from_millis(260);
+// The frontend shows the "pressed" pose between press and release; a physical click holds ~100 ms, a tap emitted
+// back to back never showed it (count rose, no animation).
+const TAP_HOLD: Duration = Duration::from_millis(100);
 
 enum Btn {
     Physical(Instant, &'static str, &'static str),
@@ -482,7 +485,10 @@ fn deliver_button(event: Btn, sink: &Sink, dom: &Mutex<Vec<(Instant, String, Str
     // A delivered tap press owns its eventual DOM release, including a long tap-and-drag.
     if !seen {
         sink("mouse-button", json!({"button": button, "action": action, "native": true}));
-        if tap { sink("mouse-button", json!({"button": button, "action": "release", "native": true})); }
+        if tap {
+            thread::sleep(TAP_HOLD);
+            sink("mouse-button", json!({"button": button, "action": "release", "native": true}));
+        }
     }
 }
 
@@ -861,7 +867,9 @@ mod tests {
         let dom = Mutex::new(vec![(t, "left".into(), "press".into())]);
         deliver_button(Btn::Tap(t, "left"), &sink, &dom);
         assert!(out.lock().unwrap().is_empty()); // no premature synthetic release
+        let started = Instant::now();
         deliver_button(Btn::Tap(t, "left"), &sink, &dom);
+        assert!(started.elapsed() >= TAP_HOLD); // press and release must not be back to back
         let out = out.lock().unwrap();
         assert_eq!(out.len(), 2); // a tap outside the DOM still gets one complete pair
         assert_eq!(out[0]["action"], "press");

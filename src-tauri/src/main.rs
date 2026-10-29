@@ -9,6 +9,7 @@
 //    events inside them into the native events the frontend expects;
 //  - `input.rs` reads /dev/input for clicks/keys everywhere else.
 mod input;
+mod native_ws;
 mod monitors;
 mod service_status;
 mod desktop_integration;
@@ -32,6 +33,7 @@ fn e2s<E: ToString>(e: E) -> String { e.to_string() }
 const SCALES: [u32; 6] = [50, 75, 100, 125, 150, 200];
 const OPACITIES: [u32; 4] = [25, 50, 75, 100];
 const COOKIES: &str = include_str!("cookies.js");
+const WS_SHIM: &str = include_str!("ws.js");
 const PLATFORM: &str = include_str!("platform.js");
 
 #[derive(PartialEq)]
@@ -282,6 +284,7 @@ fn aux(app: &AppHandle, label: &str, route: &str, title: &str, w: f64, h: f64, b
         .maximizable(false)
         .visible(false)
         .initialization_script(COOKIES)
+        .initialization_script(WS_SHIM)
         .initialization_script(PLATFORM)
         .on_page_load(|w, p| {
             if let tauri::webview::PageLoadEvent::Finished = p.event() { page_loaded(w.app_handle(), w.label()) }
@@ -764,6 +767,7 @@ fn main() {
         }))
         .plugin(tauri_plugin_deep_link::init())
         .manage(State::default())
+        .manage(native_ws::Sockets::default())
         .manage(monitors::MonitorState::default())
         .manage(service_status::ServiceStatus::default())
         .manage(desktop_integration::DesktopIntegration::default())
@@ -773,6 +777,7 @@ fn main() {
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, None))
         .on_menu_event(|app, ev| on_menu(app, ev.id().as_ref()))
         .on_window_event(|w, ev| {
+            if let WindowEvent::Destroyed = ev { w.app_handle().state::<native_ws::Sockets>().close_window(w.label()); }
             if let (WindowEvent::Destroyed, "panel") = (ev, w.label()) {
                 let _ = desktop_integration::panel_raised(w.app_handle(), false);
                 let _ = w.app_handle().emit("cat-panel-window-closed", ());
@@ -791,6 +796,7 @@ fn main() {
                 .shadow(false)
                 .focusable(false)
                 .initialization_script(COOKIES)
+        .initialization_script(WS_SHIM)
                 .initialization_script(PLATFORM)
                 .initialization_script(include_str!("shim.js"))
                 // Start fully click-through so a failed frontend can never lock the desktop.
@@ -822,6 +828,7 @@ fn main() {
         })
         .invoke_handler(tauri::generate_handler![
             load_key_press_count, save_key_press_count, load_cumulative_click_count, save_cumulative_click_count,
+            native_ws::native_ws_connect, native_ws::native_ws_send, native_ws::native_ws_close,
             set_main_hit_region, set_native_input_cursor, set_overlay_cursor, set_main_window_fullscreen_shell,
             apply_main_window_position, set_main_skip_taskbar,
             open_login_window, close_login_window, resize_login_window_to_content, open_about_window, close_about_window,

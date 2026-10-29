@@ -6,6 +6,7 @@ authoritative list of Rust crates and their versions is `src-tauri/Cargo.lock`; 
 | Component | License | How it is used |
 |---|---|---|
 | [Tauri](https://tauri.app) 2 and its plugins (opener, dialog, process, autostart, deep-link, single-instance) | MIT or Apache-2.0 | Application framework |
+| [tokio-tungstenite](https://github.com/snapview/tokio-tungstenite) 0.30 and tungstenite | MIT | Native WebSocket client for the multiplayer socket; TLS through the system OpenSSL |
 | [gtk-layer-shell](https://github.com/wmww/gtk-layer-shell) (C library) and its Rust bindings | LGPL-3.0-or-later (library, mostly MIT per its README); MIT (bindings) | Dynamically linked from the system |
 | GTK 3 and WebKitGTK | LGPL | Dynamically linked from the system |
 | Other Rust crates (about 490, see `Cargo.lock`) | Mostly MIT, Apache-2.0 or both; some Zlib, BSD, ISC, Unicode, MPL-2.0 (a handful, file-level copyleft) | Dependencies |

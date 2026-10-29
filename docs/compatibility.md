@@ -37,6 +37,8 @@ needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../
 | Key repeat (holding a key) | Counted once per key press, like the original frontend expects | Synthetic input; about 117 auto-repeats gave one press and one release |
 | Touchpad tap-to-click counting | Implemented, **unconfirmed on hardware** | Unit tests only |
 | Login via browser and `wuwa-buddy://` | Worked once (2026-10-28) | Author's real account; deep-link path also tested with a local fake callback |
+| Multiplayer socket connects | Works | Author's session: the app log shows `[SOCKET] connected`. Before the native client it failed with `connect_error`; direct handshake tests showed HTTP 403 for `Origin: tauri://localhost` and 101 for no Origin or `http://tauri.localhost`. The native client has unit tests against a local server. **Room create/join and chat were not tested.** |
+| Touchpad tap plays the pet animation | Implemented, **unconfirmed on hardware** | A tap now holds the press for 100 ms before the release (a back-to-back press and release counted but never showed the pose). Unit-tested only. |
 | Panel tabs render | Works | Author's use; DOM measurements |
 | Synthesis tab stale pixels | Fixed | A screenshot comparison fixture (`tools/check-synthesis-paint.py`) failed before the fix and passes after |
 | F8 monitor switch | Works in a virtual 2-output session | Isolated KWin. **No real external monitor tested.** |
