@@ -101,14 +101,8 @@
     {
      "before": " window size failed\",m)}",
      "old": "",
-     "new": "sy.value=!0;try{if(C){dc.value=!0;await new Promise(r=>setTimeout(r,30));await co(!0",
+     "new": "dc.value=C;co(C).catch(bad",
      "after": ")}),ae(()=>f.value?.acti"
-    },
-    {
-     "before": "indow size failed\",m)})}",
-     "old": "",
-     "new": "else{await co(!1);await wwW(k);if(k!==wwK)return;dc.value=!1}await new Promise(r=>setTimeout(r,320))}catch(m){bad(m)}finally{k===wwK&&(sy.value=!1)}}",
-     "after": "),ae(()=>f.value?.active"
     },
     {
      "before": "nel-window-root\",T.value",
@@ -130,7 +124,7 @@
     }
    ],
    "sha256_before": "f7e8ea84e08b3268639ff62eb09a02001a2e13a191862e7956cb1b2e6a44cf8b",
-   "sha256_after": "e39eb29d69a26d658b43d801acc247a35d73128d0af3d891d42e5e11b2c3b2d2"
+   "sha256_after": "de11d02d1175c23f0534004826166e1c3c953e2168a83a1c4857188a24ba0ed5"
   },
   "assets/index-BjTCKBy6.css": {
    "edits": [
@@ -149,12 +143,12 @@
     {
      "before": "ew-type{text-indent:1em}",
      "old": "",
-     "new": "\n\n/* native window resize in flight (collapse/expand): keep the content card at its design width, never stretch or clip it */\n.panel-window-root--sync .module-content{flex:0 0 849px}",
+     "new": "\n\n/* native window resize in flight (collapse/expand): keep the content card at its design width, never stretch or clip it */\n.panel-window-root--sync .module-content{flex:0 0 849px}\n/* collapse/expand: the window keeps its size (a native resize flashed stale pixels on WebKitGTK); only the card narrows and the shell makes the strip beyond it click-through */\n.panel-window-root .module-panel{contain:layout;transition:width .18s ease}\n.panel-window-root .module-panel--collapsed{width:calc(100% - 142px)!important}\n.panel-window-root:has(.module-panel--collapsed) .panel-resize-handle--e,.panel-window-root:has(.module-panel--collapsed) .panel-resize-handle--ne,.panel-window-root:has(.module-panel--collapsed) .panel-resize-handle--se{right:142px}\n.panel-window-root:has(.module-panel--collapsed) .panel-resize-handle--n,.panel-window-root:has(.module-panel--collapsed) .panel-resize-handle--s{right:192px}\n@media (prefers-reduced-motion:reduce){.panel-window-root .module-panel{transition:none}}",
      "after": "\n"
     }
    ],
    "sha256_before": "ab9ef4a81b17a658da1583891a4495cd02487918b2d303181f705c52636d7d95",
-   "sha256_after": "3757d9610aa59746ba540fd3555c425001da24ba1be02774cdf94847187c7267"
+   "sha256_after": "9c4a99345106660781d139066e46baef83db16323175583e4b8978887c158b98"
   },
   "assets/index-CHhF-M4P.js": {
    "edits": [

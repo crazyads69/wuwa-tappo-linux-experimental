@@ -12,6 +12,9 @@ for (const m of ['f.value=ww(m)', 'collapsed:dc.value,', '"panel-window-root--sy
   assert.strictEqual(js.split(m).length - 1, 1, m);
 }
 assert(css.includes('.panel-window-root--sync .module-content{flex:0 0 849px}'));
+// collapse/expand never resizes the native window: the card narrows by the 142 px rail difference instead
+assert(css.includes('.panel-window-root .module-panel--collapsed{width:calc(100% - 142px)!important}'));
+assert(js.includes('dc.value=C;co(C).catch(bad)') && !js.includes('setTimeout(r,320)'), 'collapse watcher must not sequence a native resize');
 assert(html.includes('data-ww-gate') && html.includes('document.fonts.status'));
 
 // Behaviour of the optimistic-tab guard, extracted from the shipped code.

@@ -56,12 +56,9 @@ struct State {
     show_id: AtomicU64,
 }
 
-// Panel size bookkeeping. tao's `inner_size()` is only refreshed by GTK's configure event, so two toggles
-// inside one frame would both start from the stale size; `pending` remembers what we just asked for.
 #[derive(Default)]
 struct PanelSize {
     collapsed: bool,
-    pending: Option<(Instant, f64, f64)>,
 }
 
 // ---- persisted counters: one JSON file in the app data dir ----
@@ -462,42 +459,37 @@ fn open_panel_window(app: AppHandle, payload: Option<Tab>) -> R {
 fn close_panel_window(app: AppHandle) { close(&app, "panel") }
 #[tauri::command]
 fn is_panel_window_open(app: AppHandle) -> bool { app.get_webview_window("panel").is_some() }
-// New logical size, or None when nothing would change (no redundant resize).
-fn panel_target(changed: bool, (cw, ch): (f64, f64), min_w: f64, dw: f64) -> Option<(f64, f64)> {
-    let new = (if changed { cw + dw } else { cw }.max(min_w), ch.max(760.0));
-    (changed || new != (cw, ch)).then_some(new)
+// The original resizes the panel window by 142 px on collapse/expand (width, no move; exe 0x140012c40). On
+// WebKitGTK that resize shows stale or stretched pixels for a few frames, so the window keeps its size: the page
+// narrows its card by the tab-rail difference (243 - 101 px) and the strip beyond the card is made click-through.
+const PANEL_RAIL_DELTA: f64 = 142.0;
+
+/// The clickable part of the panel window, in logical px.
+fn panel_rect(collapsed: bool, width: f64, height: f64) -> Rect {
+    const WHOLE: f64 = 32767.0; // expanded: everything is clickable, whatever the window size
+    let (width, height) = if collapsed { ((width - PANEL_RAIL_DELTA).max(0.0), height) } else { (WHOLE, WHOLE) };
+    Rect { left: 0.0, top: 0.0, width, height, member_id: None }
 }
 
-// Original math (0x140012c40): width +-142 on a state change, floored at the new min width (1100 / 958).
-// Order matters on GTK: gtk_window_resize is clamped by the current geometry-hint minimum, so when shrinking
-// the minimum must be lowered first, and when growing it is raised last (never clamp an in-flight resize).
-// tao queues both requests FIFO and runs them in one main-loop iteration, so no frame is painted between them.
-#[tauri::command]
-fn set_panel_window_collapsed(app: AppHandle, state: tauri::State<State>, payload: Collapsed) -> R {
-    let Some(w) = app.get_webview_window("panel") else { return Ok(()) };
-    let mut p = state.panel.lock().unwrap();
-    let (min_w, dw) = if payload.collapsed { (958.0, -142.0) } else { (1100.0, 142.0) };
-    let changed = p.collapsed != payload.collapsed;
-    let (cw, ch) = match p.pending {
-        Some((at, pw, ph)) if at.elapsed() < Duration::from_millis(500) => (pw, ph),
-        _ => {
-            let sf = w.scale_factor().map_err(e2s)?;
-            let s = w.inner_size().map_err(e2s)?.to_logical::<f64>(sf);
+fn apply_panel_shape(w: &WebviewWindow, collapsed: bool, size: Option<(f64, f64)>) -> R {
+    let (width, height) = match size {
+        Some(s) => s,
+        None => {
+            let s = w.inner_size().map_err(e2s)?.to_logical::<f64>(w.scale_factor().map_err(e2s)?);
             (s.width, s.height)
         }
     };
-    let Some(new) = panel_target(changed, (cw, ch), min_w, dw) else { return Ok(()) };
-    p.collapsed = payload.collapsed;
-    let min = Some(LogicalSize::new(min_w, 760.0));
-    if payload.collapsed {
-        w.set_min_size(min).map_err(e2s)?;
-        w.set_size(LogicalSize::new(new.0, new.1)).map_err(e2s)?;
-    } else {
-        w.set_size(LogicalSize::new(new.0, new.1)).map_err(e2s)?;
-        w.set_min_size(min).map_err(e2s)?;
+    set_input_shape(w, &[panel_rect(collapsed, width, height)])
+}
+
+#[tauri::command]
+fn set_panel_window_collapsed(app: AppHandle, state: tauri::State<State>, payload: Collapsed) -> R {
+    state.panel.lock().unwrap().collapsed = payload.collapsed;
+    match app.get_webview_window("panel") {
+        // Not realized yet: the first Resized event of the window applies the shape (see on_window_event).
+        Some(w) => apply_panel_shape(&w, payload.collapsed, None).or(Ok(())),
+        None => Ok(()),
     }
-    p.pending = Some((Instant::now(), new.0, new.1));
-    Ok(())
 }
 #[tauri::command]
 fn raise_panel_window_above_pets(app: AppHandle) {
@@ -778,6 +770,15 @@ fn main() {
         .on_menu_event(|app, ev| on_menu(app, ev.id().as_ref()))
         .on_window_event(|w, ev| {
             if let WindowEvent::Destroyed = ev { w.app_handle().state::<native_ws::Sockets>().close_window(w.label()); }
+            if let (WindowEvent::Resized(size), "panel") = (ev, w.label()) {
+                let app = w.app_handle();
+                if app.state::<State>().panel.lock().unwrap().collapsed {
+                    if let (Some(win), Ok(sf)) = (app.get_webview_window("panel"), w.scale_factor()) {
+                        let l = size.to_logical::<f64>(sf);
+                        let _ = apply_panel_shape(&win, true, Some((l.width, l.height)));
+                    }
+                }
+            }
             if let (WindowEvent::Destroyed, "panel") = (ev, w.label()) {
                 let _ = desktop_integration::panel_raised(w.app_handle(), false);
                 let _ = w.app_handle().emit("cat-panel-window-closed", ());
@@ -884,16 +885,13 @@ mod tests {
     }
 
     #[test]
-    fn panel_resize_follows_the_pending_size_and_skips_noops() {
-        // collapse then expand inside one frame, both starting from the stale 1100 or the pending size
-        assert_eq!(panel_target(true, (1100.0, 760.0), 958.0, -142.0), Some((958.0, 760.0)));
-        assert_eq!(panel_target(true, (958.0, 760.0), 1100.0, 142.0), Some((1100.0, 760.0)));
-        // user-widened window keeps its extra width, never drops below the new minimum
-        assert_eq!(panel_target(true, (1300.0, 900.0), 958.0, -142.0), Some((1158.0, 900.0)));
-        assert_eq!(panel_target(true, (1000.0, 700.0), 958.0, -142.0), Some((958.0, 760.0)));
-        // same state again: nothing to do unless the window is below its minimum
-        assert_eq!(panel_target(false, (1200.0, 800.0), 1100.0, 142.0), None);
-        assert_eq!(panel_target(false, (1000.0, 800.0), 1100.0, 142.0), Some((1100.0, 800.0)));
+    fn collapsed_panel_is_click_through_beyond_the_narrowed_card() {
+        let r = panel_rect(true, 1100.0, 760.0);
+        assert_eq!((r.left, r.top, r.width, r.height), (0.0, 0.0, 958.0, 760.0));
+        assert_eq!(panel_rect(true, 1300.0, 900.0).width, 1158.0); // user-widened window keeps its extra width
+        assert_eq!(panel_rect(true, 100.0, 760.0).width, 0.0); // never negative
+        let open = panel_rect(false, 1100.0, 760.0);
+        assert!(open.width >= 1100.0 && open.height >= 760.0); // expanded: everything is clickable
     }
 
     fn hit_region(update: bool, input: Vec<Rect>, passthrough: bool) -> HitRegion {

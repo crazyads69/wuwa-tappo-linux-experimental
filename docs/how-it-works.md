@@ -40,6 +40,8 @@ is not what we expect. After patching, every file is checked against a recorded 
 generated locally from the app's own fonts (subsets with exactly the same outlines, using the open-source
 `fonttools`), so a Latin text does not have to load a 6 MB font.
 
+The panel's menu collapse is one example of working around a Linux-only rendering problem. The original app resizes the panel window when the menu is collapsed. Doing that on WebKitGTK showed stale or stretched pixels for a few frames, so the window keeps its size, a CSS patch narrows the card with a short transition, and `src-tauri/src/main.rs` makes the empty strip beyond the card click-through.
+
 The patches do things like: let the frontend ask the Linux backend where the screen origin is, turn off the
 Windows-only updater, make a hidden animation loop stop when idle, wait until fonts are ready before showing a
 window, and force a redraw of the Synthesis slots (a WebKitGTK painting bug left stale pixels there).
