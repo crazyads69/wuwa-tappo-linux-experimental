@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Prepare the local, gitignored build inputs from an installer you already have.
 #   scripts/setup.sh /path/to/WuwaTappo-global_1.0.1_x64-setup.exe
-# Creates: dist/ (patched frontend), src-tauri/icons/icon.png. Nothing here is ever committed.
+# Creates: dist/ (patched frontend, incl. dist/app-icon.png). Nothing here is ever committed.
 set -euo pipefail
 
 installer="${1:-}"
@@ -31,6 +31,5 @@ cp patches/assets/WuwaTappoLatin-OFL.txt dist/assets/
 echo "==> verifying"
 python3 scripts/patch_frontend.py verify dist
 
-mkdir -p src-tauri/icons
-cp dist/app-icon.png src-tauri/icons/icon.png
-echo "done. Build with: cd src-tauri && cargo build --release"
+echo "done. Build and run with:"
+echo "  cmake -S qt -B qt/build -G Ninja && ninja -C qt/build && qt/build/wuwatappo-qt"

@@ -1,4 +1,4 @@
-// Pure geometry/state logic ported from src-tauri/src/{main,monitors}.rs. No windowing here, so it is unit-tested.
+// Pure geometry/state logic ported from the earlier Rust/Tauri shell (removed; see git history). No windowing here, so it is unit-tested.
 #pragma once
 #include <QJsonArray>
 #include <QJsonObject>
@@ -29,7 +29,7 @@ struct HitRegion {
     Rects inputRects(std::optional<Rects> &cached) const;
 };
 
-// floor/ceil+1 like the GTK input shape of the Rust shell: the DOM hit test is inclusive on the far edge.
+// floor/ceil+1 like the GTK input shape of the earlier Rust shell: the DOM hit test is inclusive on the far edge.
 QList<QRect> toPixelRects(const Rects &r);
 
 // Collapsed panel: only the narrowed card is clickable (the rest of the window is click-through).

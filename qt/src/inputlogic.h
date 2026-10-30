@@ -1,4 +1,4 @@
-// Device-independent input logic ported from src-tauri/src/input.rs: key press pairing, touchpad tap detection
+// Device-independent input logic ported from the earlier Rust/Tauri shell (removed; see git history): key press pairing, touchpad tap detection
 // (libinput semantics) and hotkey de-duplication. The evdev/KWin plumbing lives in inputmonitor.cpp.
 #pragma once
 #include <QList>

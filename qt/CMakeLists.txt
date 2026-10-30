@@ -64,8 +64,8 @@ install(TARGETS wuwatappo-qt RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 install(FILES data/com.kuro.wuwatappo.global.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 install(FILES data/com.kuro.wuwatappo.global.metainfo.xml DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 # The icon comes from the official installer (see scripts/setup.sh), so it is not shipped in git.
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../src-tauri/icons/icon.png)
-    install(FILES ../src-tauri/icons/icon.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../dist/app-icon.png)
+    install(FILES ../dist/app-icon.png DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps
             RENAME com.kuro.wuwatappo.global.png)
 endif()
 if(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../dist)

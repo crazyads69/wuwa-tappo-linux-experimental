@@ -291,7 +291,7 @@ void Backend::handleDeepLink(const QStringList &urls) {
 void Backend::registerCommands() {
     auto num = [](const Ctx &c, const char *k) { return c.a[k].toDouble(); };
 
-    // persisted counters (store.json is shared with the Tauri shell: same app-data dir)
+    // persisted counters (store.json is shared with the original (Tauri) app: same app-data dir)
     cmds_["load_key_press_count"] = [this](const Ctx &c) { return store_->read()["key_" + c.a["environment"].toString()].toDouble(0); };
     cmds_["save_key_press_count"] = [this](const Ctx &c) {
         if (!store_->set("key_" + c.a["environment"].toString(), c.a["count"])) throw Err{"cannot write store"};

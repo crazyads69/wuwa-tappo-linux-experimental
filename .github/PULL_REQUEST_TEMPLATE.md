@@ -6,7 +6,7 @@
 
 <!-- Commands you ran and the system you tested on. "Not tested on X" is fine to say. -->
 
-- [ ] `cargo test --release --locked` and `node --test tests/*.test.cjs` pass
+- [ ] `ctest --test-dir qt/build --output-on-failure` passes
 - [ ] If I touched windows, layer-shell or input regions: I ran `tools/trace_input_regions.py` and no full-screen
       surface keeps a large input region
 

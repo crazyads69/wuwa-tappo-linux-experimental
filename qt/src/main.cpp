@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     platform::selectShellIntegration();                          // must precede the application object
     QtWebEngineQuick::initialize();
     QApplication app(argc, argv);
-    QCoreApplication::setApplicationName("com.kuro.wuwatappo.global");  // = Tauri identifier: same app-data dir as the Tauri shell
+    QCoreApplication::setApplicationName("com.kuro.wuwatappo.global");  // = Tauri identifier: same app-data dir as the original (Tauri) app
     QCoreApplication::setOrganizationName({});
     QCoreApplication::setApplicationVersion(WW_VERSION);
     QGuiApplication::setDesktopFileName("com.kuro.wuwatappo.global");

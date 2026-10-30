@@ -1,6 +1,6 @@
 // The Tauri command surface of the original app, re-implemented natively. Pages call `invoke()` through the web
 // channel (js/tauri.js); replies and events travel back as signals. Command names, argument names (camelCase, as
-// Tauri converts them) and payloads follow src-tauri/src/main.rs, which was recovered from the original binary.
+// Tauri converts them) and payloads follow the original app, recovered from its binary.
 #pragma once
 #include "desktop.h"
 #include "inputmonitor.h"

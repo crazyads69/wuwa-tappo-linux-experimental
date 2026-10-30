@@ -4,7 +4,7 @@ See [docs/qt-port/FEATURES.md](../docs/qt-port/FEATURES.md) and [UNKNOWNS.md](..
 **the frontend has not been seen rendering on the dev machine (native Wayland delivers no frames there).**
 
 ```sh
-scripts/setup.sh /path/to/WuwaTappo-global_1.0.1_x64-setup.exe     # unpacks dist/ locally (same as the Tauri shell)
+scripts/setup.sh /path/to/WuwaTappo-global_1.0.1_x64-setup.exe     # unpacks dist/ locally 
 cmake -S qt -B qt/build -G Ninja && ninja -C qt/build
 ctest --test-dir qt/build --output-on-failure                       # 6 QtTest suites, no display needed
 qt/build/wuwatappo-qt                                               # finds ../dist, or set WUWA_DIST=...
