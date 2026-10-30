@@ -27,3 +27,6 @@ store.json
 /shots/
 .env
 *.token
+
+# Qt port build output
+/qt/build/
