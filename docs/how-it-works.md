@@ -13,7 +13,9 @@ The official Windows app has two halves:
    stores counters and handles the login callback.
 
 The frontend is pure web code and runs fine on Linux. The backend is Windows-specific (global input hooks, window
-styles, Windows APIs). This project keeps the frontend and **replaces the backend** with a new Linux one.
+styles, Windows APIs). This project keeps the frontend and **replaces the backend** with a native Qt 6 application:
+the frontend runs in QtWebEngine (Chromium), and a C++ `Backend` object answers the same commands the Tauri
+backend did.
 
 ```
  your installer (.exe)                         this repository
@@ -22,65 +24,68 @@ styles, Windows APIs). This project keeps the frontend and **replaces the backen
   (unpack, nothing decrypted)       (local only,     (small text edits,
                                      git-ignored)     applied by scripts/patch_frontend.py)
                                           |
-                                 embedded by Tauri at build time
+                          served from 127.0.0.1 by qt/src/httpserver.cpp
                                           |
-                                    src-tauri/ (Rust)  ->  wuwatappo-linux
+                      QtWebEngine views  <-- QWebChannel -->  C++ Backend  ->  wuwatappo-qt
 ```
 
 ## Getting the frontend without shipping it
 
-Tauri embeds the web files inside the Windows executable, compressed with Brotli (compression, not encryption).
-`scripts/extract_frontend.py` unpacks the installer with `7z`, finds the table of embedded files in the executable
-and decompresses each one. It refuses to run on any installer other than the exact version it was written for,
-checked by SHA-256.
+The original app is a Tauri app, and Tauri embeds the web files inside the Windows executable, compressed with
+Brotli (compression, not encryption). `scripts/extract_frontend.py` unpacks the installer with `7z`, finds the table
+of embedded files in the executable and decompresses each one. It refuses to run on any installer other than the
+exact version it was written for, checked by SHA-256.
 
-The frontend then needs a handful of changes to behave on Linux. They are stored as tiny "find this, replace with
-that" patches in `patches/frontend.json`, each with a few characters of context so that it fails loudly if the input
-is not what we expect. After patching, every file is checked against a recorded hash. Two small font files are
-generated locally from the app's own fonts (subsets with exactly the same outlines, using the open-source
-`fonttools`), so a Latin text does not have to load a 6 MB font.
+The frontend then needs a handful of changes. They are stored as tiny "find this, replace with that" patches in
+`patches/frontend.json`, each with a few characters of context so that it fails loudly if the input is not what we
+expect. After patching, every file is checked against a recorded hash. Two small font files are generated locally
+from the app's own fonts (subsets with exactly the same outlines, using the open-source `fonttools`), so a Latin
+text does not have to load a 6 MB font.
 
-The panel's menu collapse is one example of working around a Linux-only rendering problem. The original app resizes the panel window when the menu is collapsed. Doing that on WebKitGTK showed stale or stretched pixels for a few frames, so the window keeps its size, a CSS patch narrows the card with a short transition, and `src-tauri/src/main.rs` makes the empty strip beyond the card click-through.
-
-The patches do things like: let the frontend ask the Linux backend where the screen origin is, turn off the
+Most patches date from the earlier WebKitGTK-based shell (they work around WebKitGTK painting problems, turn off the
 Windows-only updater, make a hidden animation loop stop when idle, wait until fonts are ready before showing a
-window, and force a redraw of the Synthesis slots (a WebKitGTK painting bug left stale pixels there).
+window). They have not all been re-validated under Chromium; see [qt-port/UNKNOWNS.md](qt-port/UNKNOWNS.md) (U4).
 
-## The Linux backend (`src-tauri/src`)
+## The Qt app (`qt/`)
 
-| File | What it does |
+| Part | What it does |
 |---|---|
-| `main.rs` | Creates the windows and implements about sixty commands the frontend calls (`invoke`). The list was recovered by reading the frontend and the Windows executable (static analysis only; the executable was never run). |
-| `shim.js` | Runs in the pet window. Turns pointer events that land on the pet into the `mouse-move` and `mouse-button` events the frontend expects. |
-| `input.rs` | Reads `/dev/input/event*` read-only to count key presses and clicks everywhere, detects touchpad taps, and finds the pointer position on KDE Wayland (through a small KWin script) or X11. |
-| `monitors.rs`, `platform.js` | Chooses the output for the pet, handles F8 (switch monitor) and the coordinate maths for mixed scaling. |
-| `desktop_integration.rs` | Reads Plasma's panel and fullscreen state, and keeps the overlay layer correct. |
-| `service_status.rs` | The maintenance-notice handshake the frontend expects. |
-| `native_ws.rs`, `ws.js` | The multiplayer socket. Kuro's socket server answers a WebSocket handshake with HTTP 403 unless the `Origin` header is missing or exactly `http(s)://tauri.localhost`; WebKitGTK sends `tauri://localhost`. `ws.js` redirects that one `wss://` URL to a native client that sends no `Origin`. The client only connects to the one allowed host and path, limits message size and the number of sockets, and closes a window's sockets when it closes. |
-| `cookies.js` | The frontend keeps its session in `document.cookie`, which WebKitGTK does not persist for the `tauri://` scheme; this stores it in `localStorage` instead. |
+| `src/main.cpp` | Startup: finds `dist/`, starts the local HTTP server, enforces a single instance (a `QLocalServer`; a second start forwards its `wuwa-buddy://` URL and exits), creates the windows. |
+| `src/httpserver.cpp` | Serves `dist/` read-only on `127.0.0.1` so the pages get a stable `http` origin (cookies and `localStorage` persist, and the ES modules load, which `file://` cannot do). |
+| `js/tauri.js` | Injected into every page before the frontend runs. Provides the `window.__TAURI_INTERNALS__` object the frontend expects (`invoke`, events, channels) on top of a **QWebChannel**. |
+| `src/backend.cpp` | The `Backend`: about sixty commands the frontend calls (`invoke`) plus the plugin calls (autostart, deep-link, opener, window, event). The list was recovered by reading the frontend and the Windows executable (static analysis only; the executable was never run). Replies and events travel back to the page as signals. |
+| `src/windows.cpp`, `qml/` | One QML `Window` plus `WebEngineView` per original window label (`main`, `panel`, `login`, `about`, `toast`, ...). Sets up the layer-shell overlay, stacking, input regions and monitor placement. |
+| `src/regions.cpp`, `src/inputlogic.cpp` | Pure logic (hit regions, monitor choice, key-press pairing, touchpad taps), unit-tested without a display. |
+| `src/inputmonitor.cpp` | Reads `/dev/input/event*` read-only to count key presses and clicks everywhere, registers the F7/F8/F9 shortcuts with KDE, and gets the pointer position on KDE Wayland (a small KWin script) or X11. |
+| `src/desktop.cpp` | Reads Plasma's panel and fullscreen state (asynchronous D-Bus calls). |
+| `src/tray.cpp`, `src/platform.cpp` | Tray icon and dock menu; autostart entry (`~/.config/autostart`). |
+| `src/wsclient.cpp`, `src/wsframe.cpp`, `js/ws.js` | The multiplayer socket. Kuro's socket server answers a WebSocket handshake with HTTP 403 unless the `Origin` header is missing or exactly `http(s)://tauri.localhost`, and a browser engine sends its own origin. `ws.js` redirects that one `wss://` URL to a native client that sends no `Origin`. The client only connects to the one allowed host and path, limits message size and the number of sockets, and closes a window's sockets when it closes. |
+| `src/store.cpp` | Counters and settings in `store.json` (same directory and format as the original app). |
+| `js/pet.js` | Runs in the pet window and turns pointer events that land on the pet into the events the frontend expects. |
 
 ### The overlay trick
 
 The Windows app uses one huge transparent window that ignores the mouse, plus a global mouse hook to decide what to
 do. Wayland does not allow global mouse hooks, so this project does it the other way round:
 
-- On compositors that support the `wlr-layer-shell` protocol (KDE, Sway, Hyprland, and others; not GNOME), the pet
-  window is a **layer-shell surface** that covers the whole output, always on top, takes no keyboard focus and has
-  no taskbar entry.
+- On compositors that support the `wlr-layer-shell` protocol (KDE, Sway, Hyprland, and others; not GNOME) and with
+  LayerShellQt installed, the pet window is a **layer-shell surface** that covers the whole output, always on top,
+  takes no keyboard focus and has no taskbar entry. Otherwise a maximized always-on-top window is used.
 - The window's **input region** is shrunk to just the rectangles the frontend reports for the pet and its buttons.
   Everything outside is click-through, so your other apps keep working.
-- When the pointer is over the pet, the browser gets real pointer events, which `shim.js` forwards in the format
-  the frontend expects. Clicks and keys elsewhere are counted separately from `/dev/input`.
+- When the pointer is over the pet, the browser gets real pointer events, which `pet.js` forwards in the format the
+  frontend expects. Clicks and keys elsewhere are counted separately from `/dev/input`.
 
 There is also a second layer-shell surface, the "toast" overlay for small messages. It covers the whole screen too,
-so it must never accept input. Getting that wrong once made it swallow every click on the desktop; see the notes in
-[compatibility.md](compatibility.md).
+so it must never accept input. Getting that wrong once (in the earlier shell) made it swallow every click on the
+desktop; see the notes in [compatibility.md](compatibility.md).
 
 ### Login
 
 Login opens your browser. When it finishes, the website redirects to a `wuwa-buddy://auth/callback?...` link. The
-app registers itself as the handler for that scheme (via the Tauri deep-link and single-instance plugins), so the
-link reaches the already-running app, which hands it to the frontend.
+installed desktop entry (`qt/data/`) registers the app as the handler for that scheme; the link starts a second
+instance, which hands the URL to the running app through the single-instance socket, and the app passes it to the
+frontend.
 
 ## What it does not do
 

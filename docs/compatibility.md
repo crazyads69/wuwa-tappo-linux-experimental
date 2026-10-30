@@ -6,9 +6,17 @@ assume it was **not** tested.
 ## The one machine everything was tested on
 
 - Fedora Asahi Remix 44, aarch64 (Apple Silicon laptop)
-- KDE Plasma 6.7.5 on Wayland, KWin 6.7.5, one built-in display (3414x2134 physical, fractional scale 1.5)
-- WebKitGTK 2.54.2, GTK 3.24.52, gtk-layer-shell 0.10.0
-- Wuwa Tappo global 1.0.1 installer, a real account used by the author for the login test
+- KDE Plasma 6.7.5 on Wayland, KWin 6.7.5
+- Qt 6.11.2 with QtWebEngine, LayerShellQt 6.7.5
+- Wuwa Tappo global 1.0.1 installer
+
+**Read this first.** The app was rewritten from an earlier Rust/Tauri/WebKitGTK shell to the current Qt 6 app (the
+old shell is gone from the tree; see git history). Almost everything below the first table was measured on the old
+shell and is kept only as history. The current Qt app was verified item by item in
+[qt-port/VERIFICATION.md](qt-port/VERIFICATION.md), mostly in a nested virtual KWin with software rendering. On the
+author's real GPU and desktop the Qt overlay has **not** been seen painting (U0 in
+[qt-port/UNKNOWNS.md](qt-port/UNKNOWNS.md)). Treat the old results as "behaviour the Qt port is trying to match",
+not as a guarantee.
 
 Nothing here says the project works on x86_64, other distributions, other compositors or other hardware. That
 needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../CONTRIBUTING.md)).
@@ -16,8 +24,9 @@ needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../
 ## Checked methods
 
 - **Author's own use**: running the app on the machine above.
-- **Automated tests**: `cargo test` (33 Rust tests) and `node --test` (21 tests of the JavaScript shims and
-  patched frontend code). They test logic, not the real desktop.
+- **Automated tests**: `ctest --test-dir qt/build` (6 QtTest suites, 73 test functions: HTTP server, input logic,
+  regions, store, WebSocket client and framing). They test logic, not the real desktop. `tools/check-panel-patches.cjs`
+  checks the patched frontend.
 - **Protocol inspection**: running the app with `WAYLAND_DEBUG=client` and reading what it tells the compositor
   (`tools/trace_input_regions.py`). This proves what the app *requests*, not what every compositor does with it.
 - **Isolated sessions**: a private D-Bus session and a virtual KWin (`kwin_wayland --virtual`) for multi-monitor
@@ -25,7 +34,7 @@ needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../
 - **Synthetic input**: a temporary kernel `uinput` device for key events. It is not a certification of real
   keyboards or touchpads.
 
-## Results
+## Results (measured on the earlier WebKitGTK shell unless VERIFICATION.md says otherwise)
 
 | Area | Result | Checked by |
 |---|---|---|
@@ -53,7 +62,7 @@ needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../
 
 ## Known problems and limits
 
-- **Memory use is high.** The pet overlay covers the whole screen and holds a large amount of graphics memory (about
+- **Memory use is high (measured on the earlier shell; not re-measured with Qt).** The pet overlay covers the whole screen and holds a large amount of graphics memory (about
   200 MB in one early measurement, which does not show in normal RSS numbers). One snapshot with the panel open
   showed about 400 MB across the app and its WebKit processes. Opening extra windows adds more.
 - **Some flashing may remain** when windows open or tabs change. Windows are now hidden until the page reports it is
@@ -67,7 +76,7 @@ needs your help to find out. Test reports are welcome (see [CONTRIBUTING.md](../
   over the pet.
 - **GNOME** has no layer-shell. A maximized-window fallback exists (`WW_NO_LAYER=1` selects it) but it was not
   tested.
-- **Counters are not compatible with the Windows app's saved files.**
+- **Counters are not compatible with the Windows app's saved files.** The Qt app shares `store.json` and its directory with the earlier shell, not with Windows.
 - **The About window opens at every start** until you tick "Do not show again" (this is the frontend's behaviour).
 - **The first ~100-300 ms after start**, before the app narrows its input region, the main surface may cover the
   screen. It is brief, but it is real.

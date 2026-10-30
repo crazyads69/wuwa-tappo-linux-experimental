@@ -3,7 +3,7 @@
 Native Qt 6 shell in [`qt/`](../../qt). The frontend (`dist/`, unpacked from your own installer by `scripts/setup.sh`)
 runs **unmodified** in QtWebEngine; `qt/js/tauri.js` provides `window.__TAURI_INTERNALS__` over a QWebChannel to the
 C++ `Backend`, so the ~60 backend commands, events and plugin calls of the original are re-implemented natively.
-The Rust shell in `src-tauri/` stays the behavioural spec and still builds.
+The earlier Rust/Tauri shell (`src-tauri/`, removed from the tree after this port; see git history) was the behavioural spec for the first passes.
 
 Status legend: **done** = implemented and exercised (unit test, protocol trace or run log, named in the last column);
 **impl** = implemented but not exercised on real hardware/desktop (see [UNKNOWNS.md](UNKNOWNS.md)); **partial**;
