@@ -26,12 +26,34 @@ The frontend bundle was then searched for what it actually invokes.
 | Windows | labels `main` (overlay), `panel`, `login`, `about`, `oss-notice`, `update`, `toast` (strings + frontend routes) |
 | Tray | id `main-tray`; items `dock_bag/atlas/exchange/room/settings/window_passthrough/window_opacity_{25..100}/pet_scale_{50..200}/toggle_pet/restart/quit` (strings) |
 | Global input | `SetWindowsHookExW` `WH_KEYBOARD_LL` / `WH_MOUSE_LL`, `RegisterHotKey`, `SetWindowDisplayAffinity` (imports) |
-| Commands | 49 of the 56 frontend-facing names found verbatim in the binary; the other 7 (`get_installer_launch_locale`, `get_boot_diagnostics`, `is_internal_testing_build`, `is_devtools_hotkeys_build`, `begin/end_main_monitor_switch`, `get_main_monitor_snapshot`, `monitor_from_physical_point`) are called by the shipped frontend but their names are not visible in the binary strings: see UNKNOWNS U3 |
+| Commands | The app command names form one rodata blob (`greet` ... `set_elevated_autostart`, see [RE-TOOLS.md](RE-TOOLS.md)). Frontend-invoked names absent from the binary: `get_installer_launch_locale`, `is_internal_testing_build`, `is_devtools_hotkeys_build` (all three called inside `try/catch`, so the original degrades by ignoring the error) and `get_boot_diagnostics` (wrapped with a `null` fallback). `begin_main_monitor_switch`, `end_main_monitor_switch`, `get_main_monitor_snapshot`, `monitor_from_physical_point` are **not** original at all: they come from this repo's `patches/frontend.json` (the pristine bundle only calls `finish_main_window_monitor_switch`). Binary-only names: `greet` (template demo) and `get_taskbar_insets_at_point`, both now answered by the Qt Backend |
 | Events (backend -> page) | `cat-app-update-available`, `cat-force-update-lock`, `cat-installer-download-progress`, `cat-native-network-status-changed`, `cat-panel-window-closed`, `dock-open-panel`, `tray-set-pet-scale`, `tray-set-window-opacity`, `tray-toggle-pet-visibility`, `tray-toggle-window-passthrough`, `tray-restart`, `tray-quit`, `update-modal-open`, `maintenance-notice-open`, `mouse-move`, `mouse-button`, `key-press`, `key-release` |
 | Tauri plugin IPC used by the frontend | `window` (set_*/is_*/position/size/monitors/start_dragging...), `webview`, `event`, `app`, `path`, `opener`, `dialog`, `autostart`, `process`, `deep-link`, `updater`, `image`, `resources` (grep of `dist/assets`) |
 
 The Windows-only pieces (hooks, display affinity, elevated-autostart scheduled task, installer download progress,
 WebView2 flags) have no Linux counterpart and are listed as such.
+
+## What the full dump added (second pass)
+
+- **Assets**: 133 embedded files (`tauri-dumper` and a structural table walk agree). Against `dist/`: five JS/CSS files plus
+  `index.html` differ (exactly the patches in `patches/frontend.json`, `patch_frontend.py verify` passes), three
+  files are repo-generated (Latin font subsets + OFL text), and **two assets were missing from `dist/`** because the
+  old name-based extractor skipped them: `assets/emote_happy-DbeXE30w.png` (referenced by `index-ULLd3gpz.js`; the happy
+  emote 404ed) and `kurodata-browser/kurodata.esm.min.d.ts`. `scripts/extract_frontend.py` now walks the table; both files restored in the local `dist/`.
+- **Manifest**: the original exe asks for `requireAdministrator` (explains the "elevated autostart" scheduled task);
+  version resource: CompanyName `kuro`, ProductName `Wuwa Tappo`, 1.0.1.
+- **Updater**: endpoint `https://kurowuwabuddy2602.test.modiarts.com/app/json-host/latest-global_host.json` (a *test*
+  host) and minisign public key id `2DB584868D18BB49` are compiled in; verification via `minisign-verify` 0.2.5.
+  Qt never contacts it (`check_app_update` errors by design).
+- **Crates** (84, via `rbi` and path strings): tauri 2.10.3, wry 0.54.4, tao 0.34.6, muda 0.17.1, tray-icon 0.21.3,
+  tokio 1.50.0, reqwest 0.12.28 and 0.13.2, hyper 1.8.1, rustls 0.23.40, webview2-com 0.38.2, windows 0.61.3; rustc commit
+  `59807616e1fa...`; not cargo-auditable.
+- **Tray/dock menu**: besides the items already mapped, the original has `dock_check_app_update` (not in Qt: its
+  action has no Linux meaning without a feed). Native log strings: `left-press over-system-menu=`, `left-press matches-menu-anchor; closing`
+  (the original closes the context menu on a global left press that matches the menu anchor), `[hotkey] LL hook`,
+  `[hotkey] RegisterHotKey loop`, `[overlay-cursor] hook failed`, `[input] grab failed, fallback listen` (rdev).
+- **Events**: the frontend also listens to `global-clap-mouse` (string present in the binary, emitter not located; neither
+  shell emits it, the frontend counts clicks through `mouse-button` anyway) and `dock-context-menu-debug` (debug payload, console only).
 
 ## Feature -> Qt implementation -> status
 
