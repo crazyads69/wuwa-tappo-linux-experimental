@@ -1,4 +1,6 @@
 #include "backend.h"
+#include <limits>
+#include <algorithm>
 #include "platform.h"
 #include <QClipboard>
 #include <climits>
@@ -481,7 +483,20 @@ void Backend::registerCommands() {
     cmds_["get_main_desktop_safe_area"] = [this](const Ctx &) { return desktop_->safeArea(currentScreen(), layerMain_); };
     cmds_["get_main_taskbar_insets"] = [this](const Ctx &) { return desktop_->insets(currentScreen(), layerMain_); };
     // Present in the original binary (frontend never calls them): template demo and a point-based variant.
-    cmds_["get_taskbar_insets_at_point"] = [this](const Ctx &) { return desktop_->insets(currentScreen(), layerMain_); };
+    // FUN_14021d160: MonitorFromPoint(MONITOR_DEFAULTTONEAREST) then max(0, work - monitor) per edge; point is in physical px.
+    cmds_["get_taskbar_insets_at_point"] = [this](const Ctx &c) {
+        QScreen *best = currentScreen();
+        const QPointF pt(c.a["x"].toDouble(), c.a["y"].toDouble());
+        qint64 bestD = std::numeric_limits<qint64>::max();
+        for (QScreen *s : QGuiApplication::screens()) {
+            const qreal r = s->devicePixelRatio();
+            const QRectF g(s->geometry().x() * r, s->geometry().y() * r, s->geometry().width() * r, s->geometry().height() * r);
+            const qreal dx = std::max({g.left() - pt.x(), 0.0, pt.x() - g.right()}), dy = std::max({g.top() - pt.y(), 0.0, pt.y() - g.bottom()});
+            const qint64 d = qint64(dx * dx + dy * dy);
+            if (d < bestD) { bestD = d; best = s; }
+        }
+        return desktop_->insets(best, layerMain_);
+    };
     cmds_["greet"] = [](const Ctx &c) { return QJsonValue(QString("Hello, %1! You've been greeted from Rust!").arg(c.a["name"].toString())); };
 
     // misc

@@ -122,7 +122,15 @@ void Windows::setIgnoreInput(const QString &label, bool ignore) {
 void Windows::moveToScreen(const QString &label, QScreen *s) {
     QQuickWindow *w = wins_.value(label);
     if (!w || !s || w->screen() == s) return;  // setScreen remaps a layer surface, so only when it changes
+    // A mapped layer surface keeps the output it was created on (nested KWin, 2 outputs: the page believed it had moved but the
+    // surface stayed); unmap, retarget and map again so the compositor receives a new get_layer_surface for the new output.
+    const bool remap = isLayer(label) && w->isVisible();
+    if (remap) w->destroy();  // hide() keeps the platform window and its old output
     w->setScreen(s);
+    if (remap) {
+        w->setPosition(s->geometry().center() - QPoint(w->width() / 2, w->height() / 2));  // Qt re-picks the screen from the position on show
+        w->show();
+    }
     if (!isLayer(label) && platform::x11Session()) w->setPosition(s->geometry().center() - QPoint(w->width() / 2, w->height() / 2));
 }
 
