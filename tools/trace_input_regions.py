@@ -4,7 +4,7 @@
 An overlay that is meant to be click-through must end up with an EMPTY (or tiny) input region. A region that covers
 the whole screen means every click on the desktop is swallowed. Run the app with the client protocol log on:
 
-    WAYLAND_DEBUG=client ./src-tauri/target/release/wuwatappo-linux 2> wayland.log
+    WAYLAND_DEBUG=client qt/build/wuwatappo-qt 2> wayland.log
     python3 tools/trace_input_regions.py wayland.log
 
 Prints one line per `set_input_region` request with the surface role (layer-shell namespace or window title),

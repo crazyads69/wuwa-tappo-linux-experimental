@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.kuro.wuwatappo.global</id>
+  <name>Wuwa Tappo (unofficial Qt shell)</name>
+  <summary>Native Linux shell for the Wuwa Tappo desktop pet</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <description>
+    <p>Unofficial, experimental. Runs the frontend of the official Windows app (which you must supply from your own
+    installer) in QtWebEngine, with a transparent always-on-top click-through overlay, tray icon, global input
+    counting and the multiplayer socket implemented natively. Not affiliated with Kuro Games.</p>
+  </description>
+  <launchable type="desktop-id">com.kuro.wuwatappo.global.desktop</launchable>
+  <provides><id>com.kuro.wuwatappo.global.desktop</id></provides>
+  <content_rating type="oars-1.1"/>
+  <releases><release version="1.0.1" date="2026-10-30"/></releases>
+</component>

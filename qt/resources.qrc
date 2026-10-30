@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/App.qml</file>
+        <file>qml/Page.qml</file>
+        <file>js/tauri.js</file>
+        <file>js/ws.js</file>
+        <file>js/pet.js</file>
+    </qresource>
+</RCC>

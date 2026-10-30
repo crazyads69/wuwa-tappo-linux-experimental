@@ -32,8 +32,8 @@ in, tell a maintainer right away so it can be removed from the history too.
 
 ## Before you open a pull request
 
-- Run the checks from the [development guide](docs/development.md): `cargo test --release --locked` and
-  `node --test tests/*.test.cjs` from `src-tauri/`.
+- Run the checks from the [development guide](docs/development.md): `ctest --test-dir qt/build --output-on-failure`
+  after a fresh `cmake -S qt -B qt/build -G Ninja && ninja -C qt/build`.
 - If you touched windows, layer-shell or input regions, run the click-swallowing check described there and say so.
 - Say what you tested **on what system**. "Tested on KDE Wayland only" is a perfectly good statement.
 - Do not state things you did not verify. This project prefers "not tested" over a guess.

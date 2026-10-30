@@ -12,32 +12,44 @@ affected version or commit.
 
 This project is responsible for its own code:
 
-- the Rust app in `src-tauri/src` (window handling, the input reader, the deep-link and single-instance handling)
-- the small JavaScript shims (`shim.js`, `cookies.js`, `platform.js`)
+- the Qt app in `qt/src` (window handling, the evdev input reader, the local HTTP server, the WebSocket client, the
+  deep-link and single-instance handling)
+- the page-side shims in `qt/js` (`tauri.js`, `ws.js`, `pet.js`)
 - the setup scripts and patches
 
 Out of scope: Kuro's frontend code, servers and accounts. Report problems with those to Kuro.
 
 ## What you should know as a user
 
-- The official frontend keeps its session token in the app's browser storage (`localStorage`, under the `tauri://`
-  origin), under `~/.local/share/com.kuro.wuwatappo.global/`. Anyone or any program that can read your user profile
-  can read it. The app only sends it to Kuro's own endpoints.
+- The official frontend keeps its session token in the app's browser storage (QtWebEngine cookies and
+  `localStorage`, origin `http://127.0.0.1:<port>`), under `~/.local/share/com.kuro.wuwatappo.global/`. Anyone or any
+  program that can read your user profile can read it. The frontend sends it to Kuro's own endpoints.
 - The app reads `/dev/input/event*` read-only to count key presses and clicks. It never grabs devices or writes to
-  them, forwards key names only to the frontend and stores counters, not typed text. Read `src-tauri/src/input.rs` if
-  you want to confirm that.
+  them, forwards key names only to the frontend and stores counters, not typed text. Read `qt/src/inputmonitor.cpp` if
+  you want to confirm that. Reading `/dev/input` needs membership of the `input` group (or equivalent), which is itself
+  a privilege you should weigh.
 - On KDE the app loads a small temporary KWin script (for the pointer position and shortcuts). It unloads it on exit
   and the script stops itself a few seconds after the app dies.
 - Never post tokens, cookies, `store.json`, full logs or `wuwa-buddy://` URLs in public. Redact them first.
-- Do not run a WebKit remote inspector on an app instance that holds your real login.
+- The app starts a **local HTTP server on 127.0.0.1** to serve the unpacked frontend (preferred port 47821, a random
+  one if taken). It serves only GET/HEAD, only files below `dist/`, and only for the `Host` header `127.0.0.1:<port>`.
+  Other local users and local programs can still reach that port, and can read the (non-secret, Kuro-owned) frontend
+  files through it; the session token is not served by it.
+- The app is a **WebSocket client** for Kuro's multiplayer socket. It connects only to one allowed host and path over
+  `wss`, sends no `Origin` or cookie, and limits message size and socket count. Messages come from Kuro's server and
+  from other players; they are passed to the frontend.
+- The `wuwa-buddy://` deep link and the single-instance socket (a per-user local socket) accept a URL from another
+  process of the same user and hand it to the frontend. Treat such links like any login callback: do not open ones
+  you did not start.
+- Do not run QtWebEngine remote debugging or the `scripts/nest/cdp.py` DevTools client against an instance that holds
+  your real login.
 
 ## Supported versions
 
 Only the latest commit on `main`.
 
-## Known dependency advisories
+## Dependencies
 
-- **glib 0.18.5, `VariantStrIter` unsoundness** (GitHub Dependabot alert, moderate; fixed in glib 0.20). glib comes
-  in through the GTK 3 Rust bindings (`gtk` 0.18, `webkit2gtk`) that Tauri 2 and its window library use on Linux, so
-  it cannot be upgraded here without a change in Tauri itself. This project's own code does not use `glib::Variant`
-  (checked with a search of `src-tauri/src`). The alert stays open until the upstream stack moves on.
+The app links against your system's Qt 6 (including QtWebEngine, which is Chromium). Security fixes for those come
+from your distribution's updates, not from this repository; keep them current, because the frontend loads remote
+content from Kuro's servers inside that browser engine.

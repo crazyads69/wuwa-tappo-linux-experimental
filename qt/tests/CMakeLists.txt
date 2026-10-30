@@ -1,0 +1,18 @@
+function(ww_test name)
+    add_executable(${name} ${name}.cpp)
+    target_link_libraries(${name} PRIVATE wwcore Qt6::Test Qt6::Network ${ARGN})
+    target_include_directories(${name} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+    set_target_properties(${name} PROPERTIES AUTOMOC ON)
+    add_test(NAME ${name} COMMAND ${name})
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+endfunction()
+
+ww_test(tst_regions)
+ww_test(tst_store)
+ww_test(tst_wsframe)
+ww_test(tst_input)
+# The client and the static server are compiled into their tests directly (they need no display).
+ww_test(tst_wsclient)
+target_sources(tst_wsclient PRIVATE ${CMAKE_SOURCE_DIR}/src/wsclient.cpp)
+ww_test(tst_httpserver)
+target_sources(tst_httpserver PRIVATE ${CMAKE_SOURCE_DIR}/src/httpserver.cpp)

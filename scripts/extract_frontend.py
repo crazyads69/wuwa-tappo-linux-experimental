@@ -71,36 +71,34 @@ class PE:
         return None
 
 
-ASSET_PATH = re.compile(rb"/(?:assets/[A-Za-z0-9_.\-]+|index\.html|vite\.svg|[A-Za-z0-9_.\-/]+\.(?:js|css|png|svg|webp|json|woff2|ogg|mp3|mp4|jpg|html))")
-
-
 def carve_assets(exe_path, out):
+    """Walk every (path ptr, path len, data ptr, data len) entry of Tauri's embedded asset table in .rdata.
+
+    The table is scanned structurally instead of guessing file names from strings: a name-based scan missed
+    assets whose path string is shared with another string (e.g. assets/emote_happy-*.png).
+    """
     data = Path(exe_path).read_bytes()
     pe = PE(data)
-    found = 0
-    for path in sorted(set(ASSET_PATH.findall(data))):
-        done = False
-        for m in re.finditer(re.escape(path), data):
-            va = pe.va_of(m.start())
-            if va is None:
+    found = {}
+    for sva, size, raw, rsize in pe.sections:
+        for pos in range(raw, raw + rsize - 32, 8):
+            pptr, plen, dptr, dlen = struct.unpack_from("<QQQQ", data, pos)
+            if not (2 < plen < 300 and 0 < dlen < 60_000_000):
                 continue
-            # asset table entry: (path ptr, path len, data ptr, data len)
-            for ref in re.finditer(re.escape(struct.pack("<QQ", va, len(path))), data):
-                ptr, length = struct.unpack_from("<QQ", data, ref.start() + 16)
-                off = pe.file_offset(ptr)
-                if not off or not 0 < length < 60_000_000:
-                    continue
-                res = subprocess.run(["brotli", "-dc"], input=data[off:off + length], capture_output=True)
-                if res.returncode == 0:
-                    dest = Path(out) / path.decode().lstrip("/")
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    dest.write_bytes(res.stdout)
-                    found += 1
-                    done = True
-                    break
-            if done:
-                break
-    return found, len(set(ASSET_PATH.findall(data)))
+            po, do = pe.file_offset(pptr), pe.file_offset(dptr)
+            if po is None or do is None:
+                continue
+            name = data[po:po + plen]
+            if name[:1] != b"/" or not all(32 <= c < 127 for c in name) or name in found:
+                continue
+            res = subprocess.run(["brotli", "-dc"], input=data[do:do + dlen], capture_output=True)
+            if res.returncode == 0:
+                found[name] = res.stdout
+    for name, content in found.items():
+        dest = Path(out) / name.decode().lstrip("/")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(content)
+    return len(found), len(found)
 
 
 def main():
@@ -124,10 +122,10 @@ def main():
             sys.exit("error: payload marker not found; is this the global 1.0.1 installer?")
         (tmp / "payload.exe").write_bytes(rdata[at + len(MARKER):])
         seven_zip(tmp / "payload.exe", tmp / "inner")
-        found, total = carve_assets(tmp / "inner" / "WuwaTappo.exe", out)
-    print(f"extracted {found} files into {out} ({total - found} path strings had no asset behind them)")
-    if found < 120:
-        sys.exit("error: far fewer assets than expected; extraction failed")
+        found, _ = carve_assets(tmp / "inner" / "WuwaTappo.exe", out)
+    print(f"extracted {found} files into {out}")
+    if found != 133:  # tauri-dumper and a manual table walk both count 133 in this build
+        sys.exit("error: unexpected asset count; extraction failed")
 
 
 if __name__ == "__main__":
