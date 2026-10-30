@@ -4,8 +4,46 @@
 #include <QGuiApplication>
 #include <QIcon>
 #include <QWindow>
+#include <QScreen>
+#include <QEvent>
+#include "platform.h"
+#ifdef WW_HAVE_LAYERSHELL
+#ifdef WW_HAVE_LAYERSHELL_HEADERS
+#include <LayerShellQt/Window>
+#else
+namespace LayerShellQt { class Window : public QObject { public: static Window *get(QWindow *); }; }
+#endif
+#endif
 
 namespace ww {
+
+// With the layer-shell Qt integration every window, popup menus included, becomes a layer surface and LayerShellQt's default
+// anchors are all four edges: the menu was a full-output surface at the output's corner (seen in nested KWin). Anchor it top-left
+// and place it with margins = its Qt global position inside the output; applied on Show/Move so submenus follow too.
+namespace {
+struct MenuLayer : QObject {
+    using QObject::QObject;
+    bool eventFilter(QObject *o, QEvent *e) override {
+#ifdef WW_HAVE_LAYERSHELL
+        if ((e->type() == QEvent::Show || e->type() == QEvent::Move || e->type() == QEvent::ScreenChangeInternal) && platform::layerShellSelected())
+            if (auto *m = qobject_cast<QMenu *>(o); m && m->windowHandle())
+                if (QObject *ls = LayerShellQt::Window::get(m->windowHandle())) {
+                    const QScreen *s = m->windowHandle()->screen();
+                    const QPoint p = m->pos() - (s ? s->geometry().topLeft() : QPoint());
+                    ls->setProperty("scope", "wuwatappo-menu");
+                    ls->setProperty("anchors", 5);  // top | left
+                    ls->setProperty("exclusionZone", 0);
+                    ls->setProperty("layer", 3);
+                    ls->setProperty("keyboardInteractivity", 2);
+                    ls->setProperty("margins", QVariant::fromValue(QMargins(p.x(), p.y(), 0, 0)));
+                }
+#else
+        Q_UNUSED(o) Q_UNUSED(e)
+#endif
+        return false;
+    }
+};
+}  // namespace
 
 std::unique_ptr<QMenu> Tray::build(const MenuCfg &c) {
     auto m = std::make_unique<QMenu>();
@@ -33,6 +71,9 @@ std::unique_ptr<QMenu> Tray::build(const MenuCfg &c) {
     m->addSeparator();
     item("dock_restart", label("restart"), m.get());
     item("dock_quit", label("quit"), m.get());
+    static auto *layer = new MenuLayer(qApp);
+    m->installEventFilter(layer);
+    for (QMenu *q : m->findChildren<QMenu *>()) q->installEventFilter(layer);
     return m;
 }
 
