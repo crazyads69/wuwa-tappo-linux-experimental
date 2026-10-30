@@ -448,6 +448,9 @@ void Backend::registerCommands() {
     // insets
     cmds_["get_main_desktop_safe_area"] = [this](const Ctx &) { return desktop_->safeArea(currentScreen(), layerMain_); };
     cmds_["get_main_taskbar_insets"] = [this](const Ctx &) { return desktop_->insets(currentScreen(), layerMain_); };
+    // Present in the original binary (frontend never calls them): template demo and a point-based variant.
+    cmds_["get_taskbar_insets_at_point"] = [this](const Ctx &) { return desktop_->insets(currentScreen(), layerMain_); };
+    cmds_["greet"] = [](const Ctx &c) { return QJsonValue(QString("Hello, %1! You've been greeted from Rust!").arg(c.a["name"].toString())); };
 
     // misc
     cmds_["exit_app"] = [](const Ctx &) { QTimer::singleShot(0, qApp, &QCoreApplication::quit); return QJsonValue(); };
