@@ -45,8 +45,16 @@ var lastAck = Date.now(), stopped = false, heartbeat = new QTimer(); heartbeat.i
 function report() {
   if (stopped) return;
   if (Date.now() - lastAck > 6000) { stopped = true; heartbeat.stop(); return; }
-  var w = workspace.activeWindow, yes = !!w && w.pid !== WW_PID && w.fullScreen;
-  var g = yes && w.output ? w.output.geometry : {x:0,y:0,width:0,height:0};
+  var w = workspace.activeWindow, o = w && w.output ? w.output.geometry : null;
+  // The original (FUN_140011f80) also counts borderless windows that cover >= 98 % of the output within 8 px.
+  var cover = function() {
+    if (!w || !o || !w.noBorder || w.minimized || w.desktopWindow || w.dock) return false;
+    var f = w.frameGeometry, iw = Math.min(f.x + f.width, o.x + o.width) - Math.max(f.x, o.x), ih = Math.min(f.y + f.height, o.y + o.height) - Math.max(f.y, o.y);
+    return f.x <= o.x + 8 && f.y <= o.y + 8 && f.x + f.width >= o.x + o.width - 8 && f.y + f.height >= o.y + o.height - 8 &&
+           Math.max(iw, 0) * Math.max(ih, 0) * 100 >= o.width * o.height * 98;
+  };
+  var yes = !!w && w.pid !== WW_PID && !w.desktopWindow && !w.dock && (w.fullScreen || cover());
+  var g = yes && o ? o : {x:0,y:0,width:0,height:0};
   callDBus(WW_BUS, "/Desktop", "org.wuwatappo.Desktop", "Update", JSON.stringify([!!yes,[g.x,g.y,g.width,g.height]]), function() { lastAck = Date.now(); });
 }
 function watch(w) { w.fullScreenChanged.connect(report); w.outputChanged.connect(report); }

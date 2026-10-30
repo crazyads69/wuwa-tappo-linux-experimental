@@ -58,6 +58,19 @@ QString autoHideEdge(const QJsonArray &panels, const Box &output);
 // "[true,[x,y,w,h]]" -> output box; nullopt for "not fullscreen", garbage or oversized input.
 std::optional<Box> parseFullscreenReport(const QString &payload);
 
+// Original FUN_140011da0: internetAccess = connectivity level in {ConstrainedInternetAccess, InternetAccess}; the last
+// value starts as false and an unchanged value is not re-emitted. `reachable` is true only for QNetworkInformation::Online.
+class NetStatusDedupe {
+public:
+    std::optional<bool> update(bool reachable) { if (reachable == last_) return std::nullopt; last_ = reachable; return reachable; }
+private:
+    bool last_ = false;
+};
+
+// Original FUN_140021570 / FUN_140019230: a left press closes the panel when it exists, the skip flag
+// (set_skip_panel_outside_click_close) is off, any grace deadline has passed and the pointer is outside the panel rect.
+bool panelOutsideClose(bool panelOpen, bool skipFlag, bool pointerKnown, bool pointerInPanel, bool graceOver);
+
 // F8 handshake: one switch at a time, abandoned leases recover after 15 s, 280 ms debounce.
 class SwitchGate {
 public:

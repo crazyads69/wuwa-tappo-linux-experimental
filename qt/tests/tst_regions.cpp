@@ -104,6 +104,21 @@ private slots:
         QVERIFY(!parseFullscreenReport("[true,[0,0,null,800]]"));
         QVERIFY(!parseFullscreenReport(QString(300, 'x')));
     }
+    void networkStatusIsDedupedAndStartsOffline() {
+        NetStatusDedupe n;
+        QVERIFY(!n.update(false));                // initial state is "no internet": no event
+        QCOMPARE(n.update(true), std::optional<bool>(true));
+        QVERIFY(!n.update(true));
+        QCOMPARE(n.update(false), std::optional<bool>(false));
+    }
+    void panelClosesOnlyForAnOutsidePressWhenAllowed() {
+        QVERIFY(panelOutsideClose(true, false, true, false, true));
+        QVERIFY(!panelOutsideClose(false, false, true, false, true));  // no panel
+        QVERIFY(!panelOutsideClose(true, true, true, false, true));    // skip flag
+        QVERIFY(!panelOutsideClose(true, false, false, false, true));  // pointer unknown (Wayland without a position source)
+        QVERIFY(!panelOutsideClose(true, false, true, true, true));    // press inside the panel
+        QVERIFY(!panelOutsideClose(true, false, true, false, false));  // grace period
+    }
 };
 QTEST_APPLESS_MAIN(TstRegions)
 #include "tst_regions.moc"

@@ -101,6 +101,10 @@ std::optional<Box> parseFullscreenReport(const QString &payload) {
     return b;
 }
 
+bool panelOutsideClose(bool panelOpen, bool skipFlag, bool pointerKnown, bool pointerInPanel, bool graceOver) {
+    return panelOpen && !skipFlag && pointerKnown && graceOver && !pointerInPanel;
+}
+
 std::optional<quint64> SwitchGate::begin(Clock::time_point now) {
     using namespace std::chrono;
     if ((active_ && now - active_->second < seconds(15)) || (last_ && now - *last_ < milliseconds(280))) return std::nullopt;

@@ -124,6 +124,18 @@ private slots:
         QCOMPARE(hotkeyIndex("F8"), 1);
         QCOMPARE(hotkeyIndex("KeyA"), -1);
     }
+    void hotkeyPressIsDebouncedFor280ms() {
+        using namespace std::chrono;
+        Hotkeys h;
+        const auto t = steady_clock::now();
+        QVERIFY(h.raw(0, true, t));
+        QVERIFY(h.raw(0, false, t + milliseconds(50)));
+        QVERIFY(!h.raw(0, true, t + milliseconds(100)));    // inside the window: dropped ...
+        QVERIFY(!h.raw(0, false, t + milliseconds(120)));   // ... together with its release
+        QVERIFY(h.raw(0, true, t + milliseconds(281)));
+        QVERIFY(h.raw(0, false, t + milliseconds(300)));
+        QVERIFY(h.raw(1, true, t + milliseconds(100)));     // keys are independent
+    }
     void domDeliveredButtonSuppressesTheEvdevCopy() {
         using namespace std::chrono;
         const auto t = steady_clock::now();

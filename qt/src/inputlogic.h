@@ -64,9 +64,21 @@ int hotkeyIndex(const QString &key);
 class Hotkeys {
 public:
     // returns true when this edge should be forwarded
-    bool raw(int index, bool down) { if (down_[index] == down) return false; down_[index] = down; return true; }
+    // The original debounces every hotkey press by 280 ms (FUN_14028f270); the release of a dropped press is dropped too.
+    bool raw(int index, bool down, std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now()) {
+        if (down_[index] == down) return false;
+        down_[index] = down;
+        if (down) {
+            if (last_[index] && now - *last_[index] < std::chrono::milliseconds(280)) { dropped_[index] = true; return false; }
+            last_[index] = now;
+            return true;
+        }
+        if (dropped_[index]) { dropped_[index] = false; return false; }
+        return true;
+    }
 private:
-    std::array<bool, 3> down_{};
+    std::array<bool, 3> down_{}, dropped_{};
+    std::array<std::optional<std::chrono::steady_clock::time_point>, 3> last_{};
 };
 
 // A DOM-delivered button (inside the hit regions) suppresses the evdev copy of the same button.

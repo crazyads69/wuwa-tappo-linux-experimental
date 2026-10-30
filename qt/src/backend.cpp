@@ -1,6 +1,7 @@
 #include "backend.h"
 #include "platform.h"
 #include <QClipboard>
+#include <climits>
 #include <QCoreApplication>
 #include <QCursor>
 #include <QDesktopServices>
@@ -8,6 +9,7 @@
 #include <QFile>
 #include <QGuiApplication>
 #include <QJsonDocument>
+#include <QNetworkInformation>
 #include <QMessageBox>
 #include <QProcess>
 #include <QScreen>
@@ -46,7 +48,19 @@ Backend::Backend(Windows *w, Store *store, InputMonitor *input, Desktop *desktop
     connect(win_, &Windows::externalUrl, this, [](const QUrl &u) {
         if (u.scheme() == "https" || u.scheme() == "http") QDesktopServices::openUrl(u);
     });
-    connect(input_, &InputMonitor::input, this, [this](const QString &ev, const QJsonValue &p) { emitEvent("", ev, p); });
+    connect(input_, &InputMonitor::input, this, [this](const QString &ev, const QJsonValue &p) {
+        emitEvent("", ev, p);
+        const QJsonObject o = p.toObject();
+        if (ev == "mouse-button" && o["action"] == "press" && o["button"] == "left") closePanelOnOutsidePress();
+    });
+    // Original: WinRT NetworkInformation.NetworkStatusChanged -> {internetAccess} (FUN_140011da0, see FEATURES.md).
+    if (QNetworkInformation::loadDefaultBackend() || QNetworkInformation::loadBackendByFeatures(QNetworkInformation::Feature::Reachability)) {
+        connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this, [this](QNetworkInformation::Reachability r) {
+            if (auto v = net_.update(r == QNetworkInformation::Reachability::Online)) emitEvent("", "cat-native-network-status-changed", QJsonObject{{"internetAccess", *v}});
+        });
+    } else {
+        qInfo("[network] no QNetworkInformation backend; the frontend falls back to its own health check");
+    }
     connect(tray_, &Tray::action, this, [this](const QString &id) {
         auto tab = [&](const char *t) { emitEvent("", "dock-open-panel", t); };
         bool ok = false;
@@ -159,6 +173,24 @@ void Backend::applyMainRegions() {
     for (const Rect &r : activeRegions_) if (!r.memberId.isUndefined() && !r.memberId.isNull()) tagged.append(r.toJson());
     emitEvent("main", "__ww_regions", tagged);
     win_->setInputRects("main", toPixelRects(activeRegions_));
+}
+
+// Original FUN_140021570: a global left press outside the panel window closes it (and emits cat-panel-window-closed).
+void Backend::closePanelOnOutsidePress() {
+    QQuickWindow *w = win_->get("panel");
+    const QPoint p = input_->pointer();
+    const bool known = p.x() != INT_MIN;
+    bool inside = false;
+    if (w && known) {
+        const double dpr = w->devicePixelRatio();
+        QRectF r(w->geometry());
+        if (win_->isLayer("panel") && w->screen()) {  // anchor-less layer surfaces are centred on their output
+            const QRect s = w->screen()->geometry();
+            r = QRectF(s.x() + (s.width() - w->width()) / 2.0, s.y() + (s.height() - w->height()) / 2.0, w->width(), w->height());
+        }
+        inside = QRectF(r.x() * dpr, r.y() * dpr, r.width() * dpr, r.height() * dpr).contains(p);
+    }
+    if (panelOutsideClose(w != nullptr, skipPanelOutsideClose_, known, inside, true)) win_->destroy("panel");
 }
 
 void Backend::applyPanelShape() {
@@ -471,8 +503,12 @@ void Backend::registerCommands() {
     cmds_["is_internal_testing_build"] = [](const Ctx &) { return false; };
     cmds_["is_devtools_hotkeys_build"] = [](const Ctx &) { return false; };
     cmds_["is_elevated_autostart_enabled"] = [](const Ctx &) { return false; };  // a Windows scheduled task; the autostart plugin covers Linux
+    cmds_["set_skip_panel_outside_click_close"] = [this](const Ctx &c) {
+        for (const auto &v : c.a) if (v.isBool()) { skipPanelOutsideClose_ = v.toBool(); break; }
+        return QJsonValue();
+    };
     for (const char *n : {"save_app_ui_locale", "set_elevated_autostart", "set_main_force_cursor_ignore", "set_main_swallow_mouse",
-                          "set_main_window_content_bounds", "set_skip_panel_outside_click_close"})
+                          "set_main_window_content_bounds"})
         cmds_[n] = [](const Ctx &) { return QJsonValue(); };  // Windows-only placement/hook glue
 
     // maintenance notice (HTTP 601 handshake)

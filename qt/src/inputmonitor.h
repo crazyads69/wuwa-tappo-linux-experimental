@@ -30,6 +30,8 @@ public:
     void stop();
     void setPointerScale(double s) { if (s > 0 && std::isfinite(s)) scale_ = s; }
     // A button that already reached the frontend through the DOM (inside the hit regions) must not be counted twice.
+    // Last absolute pointer position in physical px; INT_MIN/INT_MIN while unknown (no KWin/X11 source).
+    QPoint pointer() const { return lastPos_; }
     void noteDelivered(const QString &button, const QString &action);
 
 signals:

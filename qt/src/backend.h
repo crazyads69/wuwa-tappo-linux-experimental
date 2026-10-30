@@ -77,6 +77,9 @@ private:
     bool panelCollapsed_ = false, alwaysOnTop_ = true, panelRaised_ = false, layerMain_ = false;
     std::optional<Bounds> selected_;
     SwitchGate gate_;
+    NetStatusDedupe net_;
+    bool skipPanelOutsideClose_ = false;
+    void closePanelOnOutsidePress();
     QHash<QString, int> wsIndex_;
     QSet<QString> ignoreInput_;
 };

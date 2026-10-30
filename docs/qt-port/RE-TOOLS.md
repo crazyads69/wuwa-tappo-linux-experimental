@@ -61,3 +61,30 @@ Second headless pass (callee listing, no decompiler): `FUN_1400236c0` calls `Get
 `GetClassNameW`, `FindWindowW`, `PostMessageW`: it is the "left press over the system popup menu" handler that closes the
 dock menu and emits `global-clap-mouse`. `FUN_140011da0` (network-status emitter) calls only internal helpers (no
 `NetworkListManager`/`InternetGetConnectedState` import is called directly), so its trigger stays unknown.
+
+## Third pass: working decompiler on aarch64 (this is what worked)
+
+1. `git init` + sparse `git fetch --depth 1 origin tag Ghidra_12.1.4_build` of NationalSecurityAgency/ghidra, checking out only
+   `Ghidra/Features/Decompiler/src/decompile/`.
+2. In `.../decompile/cpp`: the Makefile hard-codes `-m32` for non-x86_64 hosts, so `sed -i 's/-m32//' Makefile`, then
+   `make -j8 ghidra_opt` (about 1 minute, plain g++, no sudo). The 3.5 MB `ghidra_opt` is copied to
+   `<ghidra>/Ghidra/Features/Decompiler/os/linux_arm_64/decompile`. Ghidra (headless and REA's platform check, which looks for the
+   `linux/arm64` decompiler) accepts it; the SLEIGH `.sla` files are the ones already in the release.
+3. Import: `analyzeHeadless <proj> wuwa -import WuwaTappo.exe -preScript NoParamId.java`. With the decompiler now present, the
+   *Decompiler Parameter ID* and *Decompiler Switch Analysis* analyzers decompile every function and the JVM was OOM-killed twice
+   on this 8 GB host; `NoParamId.java` switches both off and the import then finishes in about 8 minutes. The project lives on
+   disk (not tmpfs): `/home/trilm/ww-re/gproj`; the full install is copied to `/home/trilm/ww-re/ghidra_12.1.4_PUBLIC`.
+4. `scripts/re/Decomp.java <out> <addr>...` decompiles the function containing each address
+   (`analyzeHeadless ... -process WuwaTappo.exe -noanalysis -readOnly -postScript Decomp.java ...`). Other helpers in
+   `scripts/re/`: `Xr.java` (string -> xrefs), `Callers.java`, `Fns.java`, `Lst.java` (listing), `ripscan.py` and `rdva.py`.
+5. Gap found: Ghidra left some app code undisassembled / outside functions (the hook closure around `0x140013de0..0x1400153bd`,
+   whose jump tables it does not follow), so string xrefs there were missing. `ripscan.py` scans `.text` for RIP-relative
+   displacements that land on a string and found the missing references (for example `global-clap-mouse` at `0x14001510f`). Those sites
+   were read as disassembly (`Lst.java`), not as pseudo-code.
+
+REA: `open_binary(provider_id=ghidra)` still returns `not_configured` ("GHIDRA_INSTALL_DIR is not set") and, before this pass,
+`native_decompiler: executable_missing` for linux/arm64. The runtime settings that `update_analysis_settings` can edit are only
+timeouts; the provider path is read from the MCP server's own environment, so it cannot be fixed from inside a session. To enable
+it: start the MCP client with `GHIDRA_INSTALL_DIR=/home/trilm/ww-re/ghidra_12.1.4_PUBLIC` (the arm64 decompiler is now in place).
+Consequently the findings below are Ghidra-direct observations, not REA Evidence records, and REA's `verify_*` tools could not
+be used. Everything recorded as "decompiled" has an address you can re-decompile with the scripts above.
