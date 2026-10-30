@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Wuwa Tappo
+Comment=Desktop pet overlay (unofficial native Qt shell)
+Exec=wuwatappo-qt %u
+Icon=com.kuro.wuwatappo.global
+Terminal=false
+Categories=Game;Utility;
+MimeType=x-scheme-handler/wuwa-buddy;
+StartupNotify=false
+StartupWMClass=com.kuro.wuwatappo.global
