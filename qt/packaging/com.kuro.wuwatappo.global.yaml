@@ -1,0 +1,27 @@
+# Flatpak sketch, NOT built or tested. The app expects dist/ (from the user's own installer) next to the binary or
+# in WUWA_DIST, so a Flatpak must be built locally after running scripts/setup.sh.
+app-id: com.kuro.wuwatappo.global
+runtime: org.kde.Platform
+runtime-version: '6.9'
+sdk: org.kde.Sdk
+base: io.qt.qtwebengine.BaseApp
+base-version: '6.9'
+command: wuwatappo-qt
+finish-args:
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --share=network
+  - --device=input            # evdev global input (or ask the user to grant /dev/input)
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.kde.KWin
+  - --talk-name=org.kde.kglobalaccel
+  - --talk-name=org.kde.plasmashell
+  - --own-name=org.wuwatappo.*
+modules:
+  - name: wuwatappo-qt
+    buildsystem: cmake-ninja
+    subdir: qt
+    sources:
+      - type: dir
+        path: ..
