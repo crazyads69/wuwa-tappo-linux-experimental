@@ -52,8 +52,7 @@ WebView2 flags) have no Linux counterpart and are listed as such.
   action has no Linux meaning without a feed). Native log strings: `left-press over-system-menu=`, `left-press matches-menu-anchor; closing`
   (the original closes the context menu on a global left press that matches the menu anchor), `[hotkey] LL hook`,
   `[hotkey] RegisterHotKey loop`, `[overlay-cursor] hook failed`, `[input] grab failed, fallback listen` (rdev).
-- **Events**: the frontend also listens to `global-clap-mouse` (string present in the binary, emitter not located; neither
-  shell emits it, the frontend counts clicks through `mouse-button` anyway) and `dock-context-menu-debug` (debug payload, console only).
+- **Events**: the frontend also listens to `global-clap-mouse` (emitter found with Ghidra: the Windows handler that, on a global left press, resolves `WindowFromPoint`/`GetClassNameW` and closes the native popup menu; Qt's popup does not need it and clicks are counted via `mouse-button` anyway) and `dock-context-menu-debug` (debug payload, console only).
 
 ## Feature -> Qt implementation -> status
 

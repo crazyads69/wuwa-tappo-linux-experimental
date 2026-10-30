@@ -38,3 +38,26 @@ verified by running the tool: the last column says what was.
   `set_elevated_autostart`). Segmenting it against known names left only genuinely new names as residue.
 - **Events**: hyphenated names in rodata, cross-checked against `listen("...")` calls in the frontend bundle.
 - **Ghidra run**: see below.
+
+### Ghidra run (headless, user-space, aarch64 host)
+
+`analyzeHeadless` imported and auto-analysed the 78 MB x86-64 PE in about 7 minutes (no decompiler: `os/linux_arm_64/decompile`
+is missing; the "Rust strings" are slices, so a small `GhidraScript` searched raw bytes and listed references).
+Results (addresses are image VAs, functions unnamed because the binary is stripped):
+
+| String | Referenced from |
+|---|---|
+| `cat-native-network-status-changed` | `FUN_140011da0` (3 sites): the emitter |
+| `dock-context-menu-debug` / `global-clap-mouse` / `left-press ...` | one shared blob at `140b3c3a7..`; referenced from `FUN_1400236c0` and `FUN_140019900` (the input/menu hook code) |
+| `dock-context-menu-debug` (second copy) | `FUN_1402143b0` |
+| `latest-global_host.json`, `dock_check_app_update` | data only, no code xref found without pointer-pair analysis |
+
+REA's own Ghidra provider needs `GHIDRA_INSTALL_DIR` in the environment that starts the MCP server, which could not be
+changed from inside the session; hence the direct headless run. Caveats: Ghidra logged `VarnodeContext: out of address
+spaces` for two SSE sites (harmless), and no decompilation exists, so function roles above are inferred from the callee
+list, see UNKNOWNS.md U1.
+
+Second headless pass (callee listing, no decompiler): `FUN_1400236c0` calls `GetCursorPos`, `WindowFromPoint`,
+`GetClassNameW`, `FindWindowW`, `PostMessageW`: it is the "left press over the system popup menu" handler that closes the
+dock menu and emits `global-clap-mouse`. `FUN_140011da0` (network-status emitter) calls only internal helpers (no
+`NetworkListManager`/`InternetGetConnectedState` import is called directly), so its trigger stays unknown.
